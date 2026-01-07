@@ -50,7 +50,7 @@ Loyiha uch qatlamli Clean Architecture printsipiga asoslanadi:
 ### 📁 Fayl Strukturasi
 
 ```
-rogue-game/
+Rogue-1980-JavaScript/
 ├── src/
 │   ├── domain/              # Business Logic Layer
 │   │   ├── entities/
@@ -103,8 +103,8 @@ rogue-game/
 
 1. **Repository'ni clone qiling:**
 ```bash
-git clone https://github.com/username/rogue-game.git
-cd rogue-game
+git clone https://https://github.com/jurabekkamolovdev/Rogue-1980-JavaScript
+cd Rogue-1980-JavaScript
 ```
 
 2. **Dependencies o'rnating:**
