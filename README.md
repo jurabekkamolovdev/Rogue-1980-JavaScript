@@ -103,7 +103,7 @@ Rogue-1980-JavaScript/
 
 1. **Repository'ni clone qiling:**
 ```bash
-git clone https://https://github.com/jurabekkamolovdev/Rogue-1980-JavaScript
+git clone https://github.com/jurabekkamolovdev/Rogue-1980-JavaScript
 cd Rogue-1980-JavaScript
 ```
 
@@ -188,7 +188,7 @@ MIT License. Batafsil ma'lumot uchun [LICENSE](LICENSE) faylini ko'ring.
 ## 👥 Muallif
 
 **Sizning Ismingiz**
-- GitHub: [@yourusername](https://github.com/yourusername)
+- GitHub: [@jurabekkamolovdev](https://github.com/jurabekkamolovdev)
 
 ## 🙏 Minnatdorchilik
 
