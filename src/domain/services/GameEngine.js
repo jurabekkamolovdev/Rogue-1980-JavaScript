@@ -1,5 +1,4 @@
-// src/domain/services/GameEngine.js
-
+// src/domain/services/GameEngine
 
 
 import { WEAPON_TYPES, Weapon } from "../entities/Weapon.js"
