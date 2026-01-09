@@ -1,15 +1,23 @@
 {
   "name": "rogue-1980-javascript",
   "version": "1.0.0",
+  "type": "module",
   "description": "![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)\r ![License](https://img.shields.io/badge/license-MIT-green.svg)\r ![Node](https://img.shields.io/badge/node-%3E%3D14.0.0-brightgreen.svg)",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "node src/index.js",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "blessed": "^0.1.81"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.2",
+    "eslint": "^9.39.2",
+    "globals": "^17.0.0"
   }
 }

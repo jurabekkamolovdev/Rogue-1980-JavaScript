@@ -1,0 +1,13 @@
+# .gitattributes
+
+# Auto detect text files and normalize line endings to LF
+* text=auto
+
+# JavaScript files
+*.js text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+
+# Windows batch files
+*.bat text eol=crlf
+*.cmd text eol=crlf

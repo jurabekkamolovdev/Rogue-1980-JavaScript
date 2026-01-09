@@ -44,7 +44,7 @@ export class Weapon {
     set y(dy) { this.y_ = dy; }
 
     get equipped() { return this.equipped_; }
-    set eequipped(value) { this.equipped_ = value; }
+    set equipped(value) { this.equipped_ = value; }
 
     /**
      * 
