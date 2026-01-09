@@ -1,4 +1,6 @@
-class Player {
+// src/domain/entities/Player.js
+
+export class Player {
     
     /**
      * 
@@ -37,7 +39,7 @@ class Player {
     set equippedWeapon(eW) { this.equippedWeapon_ = eW; }
 
     get gold() { return this.gold_; }
-    set gold_(value) { this.gold_ = Math.max(0, value); }
+    set gold(value) { this.gold_ = Math.max(0, value); }
 
     /**
      * 
@@ -89,8 +91,9 @@ class Player {
                 currentHealth: this.currentHealth_,
 
                 maxStrength: this.maxStrength_,
-                currentStrength: this.currentStrength_
-                
+                currentStrength: this.currentStrength_,
+
+                gold: this.gold_,
             }
         }
     }

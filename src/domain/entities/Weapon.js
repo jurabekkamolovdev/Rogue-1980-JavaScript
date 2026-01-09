@@ -1,4 +1,7 @@
-const WEAPON_TYPES = {
+// src/domain/entities/Weapon.js
+
+
+export const WEAPON_TYPES = {
     MACE: 'mace',
     BOW: 'bow',
     ARROW: 'arrow',
@@ -19,18 +22,27 @@ const WEAPON_DAMAGE = {
 };
 
 
-class Weapon {
+export class Weapon {
 
     /**
      * 
-     * @param {string}
+     * @param {string} type
      */
     constructor(type) {
         this.type_ = type;
+        this.x_ = 0;
+        this.y_ = 0;
         this.equipped_ = false;
     }
 
     get type() { return this.type_; }
+
+    get x() { return this.x_; }
+    set x(dx) { this.x_ = dx; }
+
+    get y() { return this.y_; }
+    set y(dy) { this.y_ = dy; }
+
     get equipped() { return this.equipped_; }
     set eequipped(value) { this.equipped_ = value; }
 
