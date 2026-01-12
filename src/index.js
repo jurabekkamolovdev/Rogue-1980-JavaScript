@@ -1,46 +1,3 @@
-// //src/index.js
-
-// import { GameEngine } from "./domain/services/GameEngine.js"
-
-// class RogueGame {
-//     constructor() {
-//         this.gameEngine_ = new GameEngine();
-//     }
-
-//     start() {
-//         this.gameEngine_.startNewGame();
-//     }
-
-//     getPlayerState() {
-//         return this.gameEngine_.player_.getState();
-//     }
-
-//     getWeaponState() {
-//         return this.gameEngine_.weapons;
-//     }
-
-//     getEnemyState() {
-//         return this.gameEngine_.enems;
-//     }
-
-//     getMap() {
-//         return this.gameEngine_.map;
-//     }
-// }
-
-// const game = new RogueGame();
-// game.start();
-// console.log(game.getPlayerState());
-// const weapons = game.getWeaponState();
-// weapons.map(weapon => console.log(weapon.getState()));
-
-// const enems = game.getEnemyState();
-// enems.map(enemy => console.log(enemy.getState()));
-
-// const map = game.getMap();
-// map.notViewRooms[1].printRoom();
-
-
 // src/index.js
 
 import { GameEngine } from "./domain/services/GameEngine.js";
@@ -59,6 +16,9 @@ class RogueGame {
         // Player va entitylarni xonaga joylashtirish
         this.placeEntities();
         
+        // Boshlang'ich xabar
+        this.ui_.showMessage('O\'yin boshlandi! Yurish uchun arrow keys yoki hjkl tugmalaridan foydalaning.');
+        
         // Ekranni yangilash
         this.render();
     }
@@ -70,21 +30,33 @@ class RogueGame {
         this.gameEngine_.player.x_ = Math.floor(room.width_ / 2);
         this.gameEngine_.player.y_ = Math.floor(room.height_ / 2);
 
-        // Enemies'ni random joylashtirish
+        // Enemies'ni random joylashtirish (player bilan bir joyga tushmasligi uchun)
         this.gameEngine_.enems.forEach(enemy => {
-            enemy.x = Math.floor(Math.random() * (room.width_ - 2)) + 1;
-            enemy.y = Math.floor(Math.random() * (room.height_ - 2)) + 1;
+            let x, y;
+            do {
+                x = Math.floor(Math.random() * (room.width_ - 2)) + 1;
+                y = Math.floor(Math.random() * (room.height_ - 2)) + 1;
+            } while (x === this.gameEngine_.player.x_ && y === this.gameEngine_.player.y_);
+            
+            enemy.x = x;
+            enemy.y = y;
         });
 
         // Weapons'larni random joylashtirish
         this.gameEngine_.weapons.forEach(weapon => {
-            weapon.x = Math.floor(Math.random() * (room.width_ - 2)) + 1;
-            weapon.y = Math.floor(Math.random() * (room.height_ - 2)) + 1;
+            let x, y;
+            do {
+                x = Math.floor(Math.random() * (room.width_ - 2)) + 1;
+                y = Math.floor(Math.random() * (room.height_ - 2)) + 1;
+            } while (x === this.gameEngine_.player.x_ && y === this.gameEngine_.player.y_);
+            
+            weapon.x = x;
+            weapon.y = y;
         });
     }
 
     setupControls() {
-        // Arrow keys bilan harakat
+        // Arrow keys va vim keys bilan harakat
         this.ui_.screen.key(['up', 'k'], () => {
             this.movePlayer(0, -1);
         });
@@ -130,7 +102,14 @@ class RogueGame {
             // Enemies'ni harakatlantirish
             this.moveEnemies();
             
+            // Ekranni yangilash
             this.render();
+            
+            // Barcha enemylar yo'q qilinganmi tekshirish
+            if (this.gameEngine_.enems.length === 0) {
+                this.ui_.showMessage('Barcha dushmanlar mag\'lub etildi! Siz g\'olib bo\'ldingiz!');
+                setTimeout(() => process.exit(0), 3000);
+            }
         }
     }
 
@@ -138,10 +117,16 @@ class RogueGame {
         const playerDamage = this.gameEngine_.player.attack();
         const enemyAlive = enemy.takeDamage(playerDamage);
 
-        this.ui_.showMessage(`You hit ${enemy.type} for ${playerDamage} damage!`);
+        this.ui_.showMessage(`Siz ${enemy.type}ga ${playerDamage} zarar yetkazdingiz!`);
 
         if (!enemyAlive) {
-            this.ui_.showMessage(`${enemy.type} is dead!`);
+            this.ui_.showMessage(`${enemy.type} o'ldirildi!`);
+            
+            // Oltin qo'shish
+            const goldGain = Math.floor(Math.random() * 10) + 5;
+            this.gameEngine_.player.gold += goldGain;
+            this.ui_.showMessage(`Siz ${goldGain} oltin topdingiz!`);
+            
             // Enemy'ni o'chirish
             const index = this.gameEngine_.enems.indexOf(enemy);
             this.gameEngine_.enems.splice(index, 1);
@@ -149,10 +134,10 @@ class RogueGame {
             // Enemy qaytadan uradi
             const enemyDamage = enemy.attack();
             const playerAlive = this.gameEngine_.player.takeDamage(enemyDamage);
-            this.ui_.showMessage(`${enemy.type} hits you for ${enemyDamage} damage!`);
+            this.ui_.showMessage(`${enemy.type} sizga ${enemyDamage} zarar yetkazdi!`);
 
             if (!playerAlive) {
-                this.ui_.showMessage('You died! Game Over.');
+                this.ui_.showMessage('Siz o\'ldingiz! O\'yin tugadi.');
                 setTimeout(() => process.exit(0), 2000);
             }
         }
@@ -165,7 +150,7 @@ class RogueGame {
 
         if (weapon) {
             this.gameEngine_.player.equippedWeapon = weapon;
-            this.ui_.showMessage(`You picked up a ${weapon.type}!`);
+            this.ui_.showMessage(`Siz ${weapon.type} qurolini oldingiz!`);
             
             // Weapon'ni o'chirish
             const index = this.gameEngine_.weapons.indexOf(weapon);
@@ -175,9 +160,34 @@ class RogueGame {
 
     moveEnemies() {
         const player = this.gameEngine_.player;
+        const room = this.gameEngine_.map.notViewRooms[0];
         
         this.gameEngine_.enems.forEach(enemy => {
+            const oldX = enemy.x;
+            const oldY = enemy.y;
+            
+            // Enemy harakatlanishidan oldingi pozitsiyasi
             enemy.move(player.x, player.y);
+            
+            // Devor yoki boshqa enemy bilan to'qnashuvni tekshirish
+            if (enemy.x <= 0 || enemy.x >= room.width_ - 1 || 
+                enemy.y <= 0 || enemy.y >= room.height_ - 1) {
+                // Agar devorga tushsa, eski pozitsiyasiga qaytarish
+                enemy.x = oldX;
+                enemy.y = oldY;
+            }
+            
+            // Agar enemy player'ga yetib kelsa
+            if (enemy.x === player.x && enemy.y === player.y) {
+                const enemyDamage = enemy.attack();
+                const playerAlive = this.gameEngine_.player.takeDamage(enemyDamage);
+                this.ui_.showMessage(`${enemy.type} sizga hujum qildi! ${enemyDamage} zarar!`);
+
+                if (!playerAlive) {
+                    this.ui_.showMessage('Siz o\'ldingiz! O\'yin tugadi.');
+                    setTimeout(() => process.exit(0), 2000);
+                }
+            }
         });
     }
 

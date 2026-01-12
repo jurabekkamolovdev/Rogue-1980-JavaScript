@@ -5,231 +5,243 @@ import blessed from 'blessed';
 export class GameUI {
     constructor() {
         this.screen = null;
-        this.mapBox = null;
-        this.statsBox = null;
-        this.messageBox = null;
+        this.messageBox_ = null;
+        this.mapBox_ = null;
+        this.statsBox_ = null;
+        this.statBoxes_ = [];
+        
         this.initScreen();
+        this.initBoxes();
+        this.setupKeyHandlers();
     }
 
     initScreen() {
-        // Asosiy ekranni yaratish
         this.screen = blessed.screen({
-            smartCSR: true,  // Ekranni samarali yangilash
-            title: 'Rogue 1980'
+            smartCSR: true,
+            title: 'Dungeon Game'
+        });
+    }
+
+    initBoxes() {
+        // 1. Message Box (top) - 10% height
+        this.messageBox_ = blessed.box({
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '10%',
+            content: '{center}O\'yinga xush kelibsiz!{/center}',
+            tags: true,
+            border: {
+                type: 'line'
+            },
+            style: {
+                fg: 'white',
+                bg: 'black',
+                border: {
+                    fg: 'cyan'
+                }
+            }
         });
 
-        // ESC tugmasi bosilganda o'yindan chiqish
+        // 2. Map Box (middle) - 75% height
+        this.mapBox_ = blessed.box({
+            top: '10%',
+            left: 0,
+            width: '100%',
+            height: '75%',
+            content: '',
+            tags: true,
+            border: {
+                type: 'line'
+            },
+            style: {
+                fg: 'white',
+                bg: 'black',
+                border: {
+                    fg: 'green'
+                }
+            },
+            label: ' Xarita ',
+            scrollable: false
+        });
+
+        // 3. Stats Box (bottom) - 15% height
+        this.statsBox_ = blessed.box({
+            top: '85%',
+            left: 0,
+            width: '100%',
+            height: '15%',
+            border: {
+                type: 'line'
+            },
+            style: {
+                fg: 'white',
+                bg: 'black',
+                border: {
+                    fg: 'yellow'
+                }
+            },
+            label: ' Statistika '
+        });
+
+        // Stats ichida 5 ta box (row layout)
+        const statLabels = ['HP', 'Kuch', 'Qurol', 'Oltin', 'Daraja'];
+        const statWidth = Math.floor(100 / 5);
+
+        for (let i = 0; i < 5; i++) {
+            const statBox = blessed.box({
+                parent: this.statsBox_,
+                top: 0,
+                left: `${i * statWidth}%`,
+                width: `${statWidth}%`,
+                height: '100%',
+                content: `{center}${statLabels[i]}\n---{/center}`,
+                tags: true,
+                style: {
+                    fg: 'white',
+                    bg: 'black'
+                },
+                border: {
+                    type: 'line',
+                    fg: 'gray'
+                }
+            });
+            this.statBoxes_.push(statBox);
+        }
+
+        // Add all boxes to screen
+        this.screen.append(this.messageBox_);
+        this.screen.append(this.mapBox_);
+        this.screen.append(this.statsBox_);
+    }
+
+    setupKeyHandlers() {
+        // Quit on Escape, q, or Control-C
         this.screen.key(['escape', 'q', 'C-c'], () => {
             return process.exit(0);
         });
-
-        this.createMapBox();
-        this.createStatsBox();
-        this.createMessageBox();
-
-        this.screen.render();
     }
 
-    createMapBox() {
-        // O'yin xaritasi uchun box
-        this.mapBox = blessed.box({
-            top: 0,
-            left: 0,
-            width: '70%',
-            height: '80%',
-            content: '',
-            tags: true,
-            border: {
-                type: 'line'
-            },
-            style: {
-                fg: 'white',
-                bg: 'black',
-                border: {
-                    fg: '#f0f0f0'
-                }
-            },
-            label: ' Map ',
-            scrollable: true,
-            alwaysScroll: true,
-            scrollbar: {
-                ch: ' ',
-                track: {
-                    bg: 'cyan'
-                },
-                style: {
-                    inverse: true
-                }
-            }
-        });
-
-        this.screen.append(this.mapBox);
-    }
-
-    createStatsBox() {
-        // O'yinchi statistikasi uchun box
-        this.statsBox = blessed.box({
-            top: 0,
-            left: '70%',
-            width: '30%',
-            height: '80%',
-            content: '',
-            tags: true,
-            border: {
-                type: 'line'
-            },
-            style: {
-                fg: 'white',
-                bg: 'black',
-                border: {
-                    fg: '#f0f0f0'
-                }
-            },
-            label: ' Stats '
-        });
-
-        this.screen.append(this.statsBox);
-    }
-
-    createMessageBox() {
-        // Xabarlar uchun box (pastda)
-        this.messageBox = blessed.box({
-            top: '80%',
-            left: 0,
-            width: '100%',
-            height: '20%',
-            content: 'Welcome to Rogue!\nUse arrow keys to move, ESC to quit.',
-            tags: true,
-            border: {
-                type: 'line'
-            },
-            style: {
-                fg: 'yellow',
-                bg: 'black',
-                border: {
-                    fg: '#f0f0f0'
-                }
-            },
-            label: ' Messages '
-        });
-
-        this.screen.append(this.messageBox);
-    }
-
-    renderRoom(room) {
-        let roomStr = '';
-        
-        for (let y = 0; y < room.height_; y++) {
-            for (let x = 0; x < room.width_; x++) {
-                // Border yaratish
-                if (y === 0 || y === room.height_ - 1) {
-                    roomStr += '-';
-                } else if (x === 0 || x === room.width_ - 1) {
-                    roomStr += '|';
-                } else {
-                    roomStr += '.';  // Bo'sh joy
-                }
-            }
-            roomStr += '\n';
-        }
-
-        this.mapBox.setContent(roomStr);
-        this.screen.render();
-    }
-
-    renderMap(map, player, enemies, weapons) {
-        // Hozircha birinchi xonani ko'rsatamiz
-        const currentRoom = map.notViewRooms[0];
-        let mapStr = '';
-
-        for (let y = 0; y < currentRoom.height_; y++) {
-            for (let x = 0; x < currentRoom.width_; x++) {
-                let char = '.';
-
-                // Border
-                if (y === 0 || y === currentRoom.height_ - 1) {
-                    char = '-';
-                } else if (x === 0 || x === currentRoom.width_ - 1) {
-                    char = '|';
-                }
-
-                // Player
-                if (player.x === x && player.y === y) {
-                    char = '{yellow-fg}@{/yellow-fg}';  // @ - player
-                }
-
-                // Enemies
-                enemies.forEach(enemy => {
-                    if (enemy.x === x && enemy.y === y) {
-                        char = `{red-fg}${this.getEnemyChar(enemy.type)}{/red-fg}`;
-                    }
-                });
-
-                // Weapons
-                weapons.forEach(weapon => {
-                    if (weapon.x === x && weapon.y === y) {
-                        char = '{green-fg}){/green-fg}';  // ) - weapon
-                    }
-                });
-
-                mapStr += char;
-            }
-            mapStr += '\n';
-        }
-
-        this.mapBox.setContent(mapStr);
-        this.screen.render();
-    }
-
-    getEnemyChar(type) {
-        const chars = {
-            'bat': 'B',
-            'snake': 'S',
-            'emu': 'E',
-            'rattlesnake': 'R'
-        };
-        return chars[type] || 'M';
-    }
-
-    renderStats(player) {
-        const stats = player.getState();
-        const content = `
-Player Stats
-━━━━━━━━━━━━
-
-Health: ${stats.stats.currentHealth}/${stats.stats.maxHealth}
-Strength: ${stats.stats.currentStrength}/${stats.stats.maxStrength}
-Gold: ${stats.stats.gold}
-
-Position: (${stats.position.x}, ${stats.position.y})
-
-Weapon: ${player.equippedWeapon ? player.equippedWeapon.type : 'None'}
-
-━━━━━━━━━━━━
-Controls:
-↑↓←→ - Move
-ESC - Quit
-        `;
-
-        this.statsBox.setContent(content);
-        this.screen.render();
-    }
-
+    /**
+     * Message box'ga yangi xabar qo'yish
+     * @param {string} message 
+     */
     showMessage(message) {
-        const current = this.messageBox.getContent();
-        const lines = current.split('\n');
-        
-        // Faqat oxirgi 5 ta xabarni saqlash
-        if (lines.length > 5) {
-            lines.shift();
-        }
-        
-        lines.push(message);
-        this.messageBox.setContent(lines.join('\n'));
+        this.messageBox_.setContent(`{center}${message}{/center}`);
         this.screen.render();
     }
 
-    refresh() {
+    /**
+     * Map'ni render qilish
+     * @param {Object} map - Map obyekti
+     * @param {Object} player - Player obyekti
+     * @param {Array} enemies - Enemies array
+     * @param {Array} weapons - Weapons array
+     */
+    renderMap(map, player, enemies, weapons) {
+        const room = map.notViewRooms[0];
+        let mapContent = '';
+
+        for (let y = 0; y < room.height_; y++) {
+            let line = '';
+            for (let x = 0; x < room.width_; x++) {
+                // Devorlar
+                if (x === 0 || x === room.width_ - 1 || 
+                    y === 0 || y === room.height_ - 1) {
+                    line += '{blue-fg}█{/blue-fg}';
+                }
+                // Player
+                else if (player.x === x && player.y === y) {
+                    line += '{green-fg}{bold}@{/bold}{/green-fg}';
+                }
+                // Enemies
+                else if (enemies.some(e => e.x === x && e.y === y)) {
+                    const enemy = enemies.find(e => e.x === x && e.y === y);
+                    line += this.getEnemySymbol(enemy.type);
+                }
+                // Weapons
+                else if (weapons.some(w => w.x === x && w.y === y)) {
+                    line += '{yellow-fg}){/yellow-fg}';
+                }
+                // Bo'sh joy
+                else {
+                    line += ' ';
+                }
+            }
+            mapContent += line + '\n';
+        }
+
+        this.mapBox_.setContent(mapContent);
         this.screen.render();
+    }
+
+    /**
+     * Enemy turini belgilaydi
+     * @param {string} enemyType 
+     * @returns {string}
+     */
+    getEnemySymbol(enemyType) {
+        const symbols = {
+            'zombie': '{red-fg}Z{/red-fg}',
+            'vampire': '{magenta-fg}V{/magenta-fg}',
+            'ghost': '{white-fg}G{/white-fg}',
+            'ogre': '{red-fg}{bold}O{/bold}{/red-fg}',
+            'snake': '{green-fg}S{/green-fg}'
+        };
+        return symbols[enemyType] || '{red-fg}E{/red-fg}';
+    }
+
+    /**
+     * Player statistikasini yangilash
+     * @param {Object} player 
+     */
+    renderStats(player) {
+        const state = player.getState();
+        const { stats } = state;
+        
+        // HP
+        const hpColor = stats.currentHealth < 4 ? 'red' : 'green';
+        this.statBoxes_[0].setContent(
+            `{center}HP\n{${hpColor}-fg}{bold}${stats.currentHealth}{/bold}{/${hpColor}-fg}/{bold}${stats.maxHealth}{/bold}{/center}`
+        );
+
+        // Kuch
+        this.statBoxes_[1].setContent(
+            `{center}Kuch\n{bold}${stats.currentStrength}{/bold}/{bold}${stats.maxStrength}{/bold}{/center}`
+        );
+
+        // Qurol (equipped weapon)
+        const weaponText = player.equippedWeapon ? player.equippedWeapon.type : 'Yo\'q';
+        this.statBoxes_[2].setContent(
+            `{center}Qurol\n{yellow-fg}{bold}${weaponText}{/bold}{/yellow-fg}{/center}`
+        );
+
+        // Oltin
+        this.statBoxes_[3].setContent(
+            `{center}Oltin\n{yellow-fg}{bold}${stats.gold}{/bold}{/yellow-fg}{/center}`
+        );
+
+        // Daraja (level) - hozircha 1
+        this.statBoxes_[4].setContent(
+            `{center}Daraja\n{cyan-fg}{bold}1{/bold}{/cyan-fg}{/center}`
+        );
+
+        this.screen.render();
+    }
+
+    /**
+     * Ekranni yangilash
+     */
+    render() {
+        this.screen.render();
+    }
+
+    /**
+     * UI'ni to'xtatish
+     */
+    destroy() {
+        if (this.screen) {
+            this.screen.destroy();
+        }
     }
 }

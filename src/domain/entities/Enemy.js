@@ -2,34 +2,41 @@
 
 
 export const ENEMY_TYPES = {
-    BAT: 'bat',
-    SNAKE: 'snake',
-    EMU: 'emu',
-    RATTLESNAKE: 'rattlesnake'
+    Zombie: 'zombie',
+    Vampire: 'vampire ',
+    Ghost: 'ghost',
+    Ogre: 'ogre',
+    Snake: 'snake'
 }
 
 const ENEMY_STATS = {
-    [ENEMY_TYPES.BAT]: {
-        hpMin: 1, 
-        hpMax: 8,
+    [ENEMY_TYPES.Zombie]: {
+        hpMin: 2, 
+        hpMax: 16,
         dmgMin: 1,
         dmgMax: 2
     },
-    [ENEMY_TYPES.SNAKE]: {
+    [ENEMY_TYPES.Vampire]: {
         hpMin: 1,
         hpMax: 8,
         dmgMin: 1,
         dmgMax: 3
     },
-    [ENEMY_TYPES.EMU]: {
+    [ENEMY_TYPES.Ghost]: {
         hpMin: 1,
         hpMax: 8,
         dmgMin: 1,
         dmgMax: 2
     },
-    [ENEMY_TYPES.RATTLESNAKE]: {
+    [ENEMY_TYPES.Ogre]: {
         hpMin: 2,
         hpMax: 16,
+        dmgMin: 1,
+        dmgMax: 6
+    },
+    [ENEMY_TYPES.Snake]: {
+        hpMin: 1,
+        hpMax: 8,
         dmgMin: 1,
         dmgMax: 6
     }
