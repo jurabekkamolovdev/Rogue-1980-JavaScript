@@ -3,6 +3,7 @@
 
 import { WEAPON_TYPES, Weapon } from "../entities/Weapon.js"
 import { ENEMY_TYPES, Enemy } from "../entities/Enemy.js"
+import { Map } from "../entities/Map.js"
 import { Player } from "../entities/Player.js"  
 
 export class GameEngine {
@@ -10,12 +11,14 @@ export class GameEngine {
         this.player_ = null;
         this.weapons_ = [];
         this.enems_ = [];
+        this.map_ = null;
         this.level_ = 1;
     }
 
     get player() { return this.player_; }
     get weapons() { return this.weapons_; }
     get enems() { return this.enems_; }
+    get map() { return this.map_; }
 
     startNewGame() {
         this.level_ = 1;
@@ -30,6 +33,7 @@ export class GameEngine {
 
         this.generateWeapons();
         this.generateEnems();
+        this.generateMap();
     }
 
     generateWeapons() {
@@ -62,6 +66,10 @@ export class GameEngine {
         }
     }
 
+    generateMap() {
+        this.map_ = new Map();
+    }
+    
     generatePlayer() {
         this.player_ = new Player();
     }

@@ -22,6 +22,10 @@ class RogueGame {
     getEnemyState() {
         return this.gameEngine_.enems;
     }
+
+    getMap() {
+        return this.gameEngine_.map;
+    }
 }
 
 const game = new RogueGame();
@@ -32,5 +36,6 @@ weapons.map(weapon => console.log(weapon.getState()));
 
 const enems = game.getEnemyState();
 enems.map(enemy => console.log(enemy.getState()));
-// console.log(game.getWeaponState());
-// console.log(game.getEnemyState());
+
+const map = game.getMap();
+map.notViewRooms[1].printRoom();
