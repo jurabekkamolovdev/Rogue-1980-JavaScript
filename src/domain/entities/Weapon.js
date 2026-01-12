@@ -67,4 +67,11 @@ export class Weapon {
         return damage;
     }
 
+    getState() {
+        return {
+            type: this.type_,
+            damage: this.calculateDamage()
+        }
+    }
+
 }
