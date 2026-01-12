@@ -1,3 +1,6 @@
+// src/domain/entities/Map.js
+
+
 const ROOMS_IN_WIDTH = 3;
 const ROOMS_IN_HEIGHT = 3;
 const ROOMS_NUM = ROOMS_IN_HEIGHT * ROOMS_IN_WIDTH;
@@ -14,7 +17,7 @@ export class Map {
     constructor() {
         this.viewRooms_ = [];
         this.notViewRooms_ = [];
-        
+
         this.generateRooms();
     }
 

@@ -1,3 +1,6 @@
+// src/domain/entities/Enemy.js
+
+
 export const ENEMY_TYPES = {
     BAT: 'bat',
     SNAKE: 'snake',

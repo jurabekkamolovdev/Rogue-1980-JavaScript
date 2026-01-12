@@ -1,3 +1,6 @@
+// src/domain/entities/Room.js
+
+
 export class Room {
     constructor(width, height) {
         this.width_ = width;
