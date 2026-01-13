@@ -10,22 +10,31 @@ export class Player {
     constructor(x = 0, y = 0) {
         this.x_ = x;
         this.y_ = y;
+
         this.maxHealth_ = 12;
         this.currentHealth_ = 12;
+
         this.maxStrength_ = 17;
         this.currentStrength_ = 1;
+
         this.equippedWeapon_ = null;
+
         this.armor_ = 0;
+
+        this.maxExperience_ = 10
         this.experience_ = 0;
+
         this.inventory_ = [];
+
         this.gold_ = 0;
+
         this.level_ = 1;
     }
 
     get x() { return this.x_; }
-    get y() { return this.y_; } 
-
     set x(value) { this.x_ = value; }
+    
+    get y() { return this.y_; } 
     set y(value) { this.y_ = value; }
 
 
@@ -50,6 +59,7 @@ export class Player {
     get armor() { return this.armor_; }
 
     get experience() { return this.experience_; }
+    get maxExperience() { return this.maxExperience_; }
 
     get level() { return this.level_; }
 
@@ -126,13 +136,19 @@ export class Player {
             position: { x: this.x_, y: this.y_},
             stats: {
                 level: this.level_,
+
                 maxHealth: this.maxHealth_,
                 currentHealth: this.currentHealth_,
+
                 maxStrength: this.maxStrength_,
                 currentStrength: this.currentStrength_,
+
                 gold: this.gold_,
+
                 armor: this.armor_,
-                experience: this.experience_
+
+                experience: this.experience_,
+                maxExperience: this.maxExperience_
             }
         }
     }
