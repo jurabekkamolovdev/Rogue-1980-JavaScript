@@ -54,7 +54,7 @@ export class GameEngine {
     generateEnems() {
         this.enems_ = [];
 
-        const enemsCount = this.level_ + Math.floor(Math.random() * 4);
+        const enemsCount = this.level_ + Math.floor(Math.random() * 2);
 
         const enemsTypes = Object.values(ENEMY_TYPES);
 

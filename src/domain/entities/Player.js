@@ -15,12 +15,18 @@ export class Player {
         this.maxStrength_ = 17;
         this.currentStrength_ = 1;
         this.equippedWeapon_ = null;
+        this.armor_ = 0;
+        this.experience_ = 0;
         this.inventory_ = [];
         this.gold_ = 0;
+        this.level_ = 1;
     }
 
     get x() { return this.x_; }
     get y() { return this.y_; } 
+
+    set x(value) { this.x_ = value; }
+    set y(value) { this.y_ = value; }
 
 
     get health() { return this.currentHealth_; }
@@ -41,6 +47,12 @@ export class Player {
     get gold() { return this.gold_; }
     set gold(value) { this.gold_ = Math.max(0, value); }
 
+    get armor() { return this.armor_; }
+
+    get experience() { return this.experience_; }
+
+    get level() { return this.level_; }
+
     /**
      * 
      * @param {number} dx 
@@ -57,12 +69,26 @@ export class Player {
      * @returns {boolean}
      */
     takeDamage(amount) {
-        this.currentHealth_ -= amount
+        const actualDamage = Math.max(1, amount - this.armor_);
+        this.currentHealth_ -= actualDamage
+
         if(this.currentHealth_ < 0) {
             this.currentHealth_ = 0;
         }
 
         return this.currentHealth_ > 0;
+    }
+
+    /**
+     * 
+     * @param {number} amount 
+     */
+    gainExperience(amount) {
+        this.experience_ += amount;
+        
+        if (this.experience_ >= this.level_ * 10) {
+            this.levelUp();
+        }
     }
 
     /**
@@ -83,17 +109,30 @@ export class Player {
         return damage;
     }
 
+    levelUp() {
+        this.level_++;
+        this.maxHealth_ += 2;
+        this.currentHealth_ = this.maxHealth_;
+        this.maxStrength_++;
+        this.currentStrength_ = this.maxStrength_;
+    }
+
+    /**
+     * 
+     * @returns {Object}
+     */
     getState() {
         return {
             position: { x: this.x_, y: this.y_},
             stats: {
+                level: this.level_,
                 maxHealth: this.maxHealth_,
                 currentHealth: this.currentHealth_,
-
                 maxStrength: this.maxStrength_,
                 currentStrength: this.currentStrength_,
-
                 gold: this.gold_,
+                armor: this.armor_,
+                experience: this.experience_
             }
         }
     }

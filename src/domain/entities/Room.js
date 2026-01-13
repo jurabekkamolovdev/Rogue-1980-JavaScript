@@ -12,6 +12,11 @@ export class Room {
         );
     }
 
+    get width() { return this.width_; }
+    get height() { return this.height_; }
+
+    
+
     printRoom() {
         for(let i = 0; i < this.height_; i++) {
             let temp = '';

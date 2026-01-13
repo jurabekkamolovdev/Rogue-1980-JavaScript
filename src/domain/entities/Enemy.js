@@ -3,7 +3,7 @@
 
 export const ENEMY_TYPES = {
     Zombie: 'zombie',
-    Vampire: 'vampire ',
+    Vampire: 'vampire',
     Ghost: 'ghost',
     Ogre: 'ogre',
     Snake: 'snake'
@@ -11,30 +11,35 @@ export const ENEMY_TYPES = {
 
 const ENEMY_STATS = {
     [ENEMY_TYPES.Zombie]: {
+        char: 'Z',
         hpMin: 2, 
         hpMax: 16,
         dmgMin: 1,
         dmgMax: 2
     },
     [ENEMY_TYPES.Vampire]: {
+        char: 'V',
         hpMin: 1,
         hpMax: 8,
         dmgMin: 1,
         dmgMax: 3
     },
     [ENEMY_TYPES.Ghost]: {
+        char: 'G',
         hpMin: 1,
         hpMax: 8,
         dmgMin: 1,
         dmgMax: 2
     },
     [ENEMY_TYPES.Ogre]: {
+        char: 'O',
         hpMin: 2,
         hpMax: 16,
         dmgMin: 1,
         dmgMax: 6
     },
     [ENEMY_TYPES.Snake]: {
+        char: 'S',
         hpMin: 1,
         hpMax: 8,
         dmgMin: 1,
@@ -57,6 +62,7 @@ export class Enemy {
     }
 
     get type() { return this.type_ }
+
     get x() { return this.x_ }
     set x(val) { this.x_ = val }
 
@@ -66,6 +72,10 @@ export class Enemy {
     get health() { return this.health_ }
     get damage() { return this.damage_ }
 
+    get char() { 
+        return ENEMY_STATS[this.type_].char 
+    }
+
     generateEnemy() {
         const stats = ENEMY_STATS[this.type_]
         if (!stats) return
@@ -74,6 +84,11 @@ export class Enemy {
         this.damage_ = Math.floor(Math.random() * (stats.dmgMax - stats.dmgMin + 1)) + stats.dmgMin
     }
 
+    /**
+     * 
+     * @param {Number} playerX 
+     * @param {Number} playerY 
+     */
     move(playerX, playerY) {
         const dx = playerX - this.x_;
         const dy = playerY - this.y_;
@@ -87,6 +102,11 @@ export class Enemy {
         }
     }
 
+    /**
+     * 
+     * @param {Number} amount 
+     * @returns { Boolean }
+     */
     takeDamage(amount) {
         this.health_ -= amount;
         if(this.health_ < 0) {
@@ -96,10 +116,18 @@ export class Enemy {
         return this.health_ > 0;
     }
 
+    /**
+     * 
+     * @returns { Number }
+     */
     attack() {
         return this.damage_;
     }
 
+    /**
+     * 
+     * @returns { Object }
+     */
     getState() {
         return {
             type: this.type_,

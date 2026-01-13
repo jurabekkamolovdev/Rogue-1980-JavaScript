@@ -11,7 +11,7 @@ export const WEAPON_TYPES = {
     SPEAR: 'spear'
 }
 
-const WEAPON_DAMAGE = {
+const WEAPON_STATS = {
     [WEAPON_TYPES.MACE]: { min: 2, max: 3},
     [WEAPON_TYPES.BOW]: { min: 1, max: 1},
     [WEAPON_TYPES.ARROW]: { min: 1, max: 3},
@@ -29,6 +29,10 @@ export class Weapon {
      * @param {string} type
      */
     constructor(type) {
+        if(!WEAPON_STATS[type]) {
+            throw new Error(`Unknown weapon type: ${type}`);
+        }
+
         this.type_ = type;
         this.x_ = 0;
         this.y_ = 0;
@@ -51,7 +55,7 @@ export class Weapon {
      * @returns {{min: number, max: number}}
      */
     getDamageStats() {
-        return WEAPON_DAMAGE[this.type_];
+        return WEAPON_STATS[this.type_];
     }
 
     /**
@@ -67,6 +71,10 @@ export class Weapon {
         return damage;
     }
 
+    /**
+     * 
+     * @returns {Object}
+     */
     getState() {
         return {
             type: this.type_,

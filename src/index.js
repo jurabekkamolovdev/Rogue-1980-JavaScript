@@ -27,8 +27,8 @@ class RogueGame {
         const room = this.gameEngine_.map.notViewRooms[0];
         
         // Player'ni xona o'rtasiga qo'yish
-        this.gameEngine_.player.x_ = Math.floor(room.width_ / 2);
-        this.gameEngine_.player.y_ = Math.floor(room.height_ / 2);
+        this.gameEngine_.player.x = Math.floor(room.width_ / 2);
+        this.gameEngine_.player.y = Math.floor(room.height_ / 2);
 
         // Enemies'ni random joylashtirish (player bilan bir joyga tushmasligi uchun)
         this.gameEngine_.enems.forEach(enemy => {
@@ -57,19 +57,19 @@ class RogueGame {
 
     setupControls() {
         // Arrow keys va vim keys bilan harakat
-        this.ui_.screen.key(['up', 'k'], () => {
+        this.ui_.screen.key(['up', 'w'], () => {
             this.movePlayer(0, -1);
         });
 
-        this.ui_.screen.key(['down', 'j'], () => {
+        this.ui_.screen.key(['down', 's'], () => {
             this.movePlayer(0, 1);
         });
 
-        this.ui_.screen.key(['left', 'h'], () => {
+        this.ui_.screen.key(['left', 'a'], () => {
             this.movePlayer(-1, 0);
         });
 
-        this.ui_.screen.key(['right', 'l'], () => {
+        this.ui_.screen.key(['right', 'd'], () => {
             this.movePlayer(1, 0);
         });
     }
@@ -89,7 +89,7 @@ class RogueGame {
             const enemyAt = this.gameEngine_.enems.find(
                 e => e.x === newX && e.y === newY
             );
-
+            console.log(enemyAt.x);
             if (enemyAt) {
                 this.handleCombat(enemyAt);
             } else {
@@ -178,7 +178,7 @@ class RogueGame {
             }
             
             // Agar enemy player'ga yetib kelsa
-            if (enemy.x === player.x && enemy.y === player.y) {
+            if ((enemy.x === player.x && enemy.y === player.y)) {
                 const enemyDamage = enemy.attack();
                 const playerAlive = this.gameEngine_.player.takeDamage(enemyDamage);
                 this.ui_.showMessage(`${enemy.type} sizga hujum qildi! ${enemyDamage} zarar!`);
