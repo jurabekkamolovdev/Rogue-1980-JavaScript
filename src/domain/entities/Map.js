@@ -22,6 +22,10 @@ export class Map {
     }
 
     get viewRooms() { return this.viewRooms_; }
+
+    /**
+     * @returns { Array<Room> }
+     */
     get notViewRooms() { return this.notViewRooms_; }
 
     generateRooms() {

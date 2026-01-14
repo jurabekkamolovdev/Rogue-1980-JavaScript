@@ -29,8 +29,6 @@ export class GameEngine {
     }
 
     generateLevel() {
-        console.log(`Daraga ${this.level_} generatsiya qilinmoqda...`);
-
         this.generateWeapons();
         this.generateEnems();
         this.generateMap();
@@ -72,5 +70,29 @@ export class GameEngine {
     
     generatePlayer() {
         this.player_ = new Player();
+    }
+
+    placeEntities() {
+        this.placePlayer();
+        this.placeWeapons();
+    }
+
+    placePlayer() {
+        const notViewRooms = this.map_.notViewRooms;
+        const viewRooms = this.map_.viewRooms;
+        
+        const randomIndex = Math.floor(Math.random() * notViewRooms.length);
+        const randomRoom = notViewRooms[randomIndex];
+        
+        notViewRooms.splice(randomIndex, 1);
+        viewRooms.push(randomRoom);
+
+        const availableCells = randomRoom.findAvailableCells();
+        const startPosition = availableCells[Math.floor(Math.random() * availableCells.length)];
+
+        this.player_.x = startPosition.x;
+        this.player_.y = startPosition.y;
+
+        randomRoom.setEntitiesInGrid(this.player_, startPosition);
     }
 }

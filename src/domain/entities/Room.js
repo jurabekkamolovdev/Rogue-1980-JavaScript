@@ -18,17 +18,29 @@ export class Room {
 
     get grid() { return this.grid_; }
 
+    /**
+     * 
+     * @param {any} value 
+     * @param {{x: number, y: number}} position 
+     */
+    setEntitiesInGrid(value, position) {
+        this.grid_[position.y][position.x] = value;
+    }
+
+    /**
+     * 
+     * @returns {Array<{x: number, y: number}>}
+     */
     findAvailableCells() {
         const result = [];
-
         for(let i = 0; i < this.height_; i++) {
             for(let j = 0; j < this.width_; j++) {
                 if(this.grid_[i][j] === 0) {
-                    result.push({x: i, y: j})
+                    result.push({x: j, y: i})
                 }
             }
         }
-
+        return result;
     }
 
     setWalls() {
