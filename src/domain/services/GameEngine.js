@@ -75,6 +75,7 @@ export class GameEngine {
     placeEntities() {
         this.placePlayer();
         this.placeWeapons();
+        this.placeEnems();
     }
 
     placePlayer() {
@@ -111,6 +112,24 @@ export class GameEngine {
             weapon.y = startPosition.y;
 
             randomRoom.setEntitiesInGrid(weapon, startPosition);
+        }
+    }
+
+    placeEnems() {
+        while(this.enems_.length > 0) {
+            const notViewRooms = this.map_.notViewRooms;
+            const randomRoomsIndex = Math.floor(Math.random() * notViewRooms.length);
+            const randomRoom = notViewRooms[randomRoomsIndex];
+
+            const enemy = this.enems_.pop();
+
+            const availableCells = randomRoom.findAvailableCells();
+            const startPosition = availableCells[Math.floor(Math.random() * availableCells.length)];
+
+            enemy.x = startPosition.x;
+            enemy.y = startPosition.y;
+
+            randomRoom.setEntitiesInGrid(enemy, startPosition);
         }
     }
 }
