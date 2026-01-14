@@ -21,6 +21,9 @@ export class Map {
         this.generateRooms();
     }
 
+    /**
+     * @returns { Array<Room> }
+     */
     get viewRooms() { return this.viewRooms_; }
 
     /**

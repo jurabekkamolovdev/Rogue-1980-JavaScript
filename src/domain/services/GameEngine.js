@@ -95,4 +95,22 @@ export class GameEngine {
 
         randomRoom.setEntitiesInGrid(this.player_, startPosition);
     }
+
+    placeWeapons() {
+        while(this.weapons_.length > 0) {
+            const notViewRooms = this.map_.notViewRooms;
+            const randomRoomsIndex = Math.floor(Math.random() * notViewRooms.length);
+            const randomRoom = notViewRooms[randomRoomsIndex];
+
+            const weapon = this.weapons_.pop();
+
+            const availableCells = randomRoom.findAvailableCells();
+            const startPosition = availableCells[Math.floor(Math.random() * availableCells.length)];
+
+            weapon.x = startPosition.x;
+            weapon.y = startPosition.y;
+
+            randomRoom.setEntitiesInGrid(weapon, startPosition);
+        }
+    }
 }
