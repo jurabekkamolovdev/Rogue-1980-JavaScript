@@ -89,17 +89,22 @@ export class Enemy {
      * @param {Number} playerX 
      * @param {Number} playerY 
      */
-    move(playerX, playerY) {
+    calculateMove(playerX, playerY) {
         const dx = playerX - this.x_;
         const dy = playerY - this.y_;
 
         if (Math.abs(dx) > Math.abs(dy)) {
-            this.x_ += Math.sign(dx);
+            return this.x_ + Math.sign(dx);
         }
 
         else if (Math.abs(dy) !== 0) {
-            this.y_ += Math.sign(dy);
+            return this.y_ + Math.sign(dy);
         }
+    }
+
+    move(dx, dy) {
+        this.x_ += dx;
+        this.y_ += dy;
     }
 
     /**

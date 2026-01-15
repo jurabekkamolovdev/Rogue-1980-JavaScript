@@ -1,10 +1,14 @@
 // src/domain/entities/Room.js
-
-
+import { Enemy } from "./Enemy.js"
+import { Weapon } from "./Weapon.js"
+import { Player } from "./Player.js"
 export class Room {
     constructor(width, height) {
         this.width_ = width;
         this.height_ = height;
+
+        this.mapX_ = 0;
+        this.mapY_ = 0;
 
         this.grid_ = Array.from(
             { length: height },
@@ -17,6 +21,12 @@ export class Room {
     get height() { return this.height_; }
 
     get grid() { return this.grid_; }
+
+    get mapX() { return this.mapX_; }
+    set mapX(value) { this.mapX_ = value; }
+
+    get mapY() { return this.mapY_; }
+    set mapY(value) { this.mapY_ = value; }
 
     /**
      * 
@@ -53,11 +63,45 @@ export class Room {
         }
     }
 
+    /**
+     * 
+     * @returns {Player}
+     */
+    getPlayer() {
+        return this.grid_.flat().find(p => p instanceof Player) || null;
+    }
+
+    /**
+     * 
+     * @returns {Array<Weapon>}
+     */
+    getWeapons() {
+        return this.grid_.flat().filter(we => we instanceof Weapon);
+    }
+
+    /**
+     * 
+     * @returns { Array<Enemy> }
+     */
+    getEnems() {
+        return this.grid_.flat().filter(en => en instanceof Enemy);
+    }
+
     printRoom() {
         for(let i = 0; i < this.height_; i++) {
             let temp = '';
             for(let j = 0; j < this.width_; j++) {
-                temp += '0';
+                if(this.grid_[i][j] === 1) {
+                    temp += '1';
+                } else if(this.grid_[i][j] instanceof Enemy) {
+                    temp += 'E';
+                } else if(this.grid_[i][j] instanceof Weapon) {
+                    temp += 'W';
+                } else if(this.grid_[i][j] instanceof Player) {
+                    temp += 'P';
+                } else {
+                    temp += ' ';
+                }
             }
             console.log(temp);
         }

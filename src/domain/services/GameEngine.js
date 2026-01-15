@@ -13,19 +13,22 @@ export class GameEngine {
         this.enems_ = [];
         this.map_ = null;
         this.level_ = 1;
+        this.playRoom_ = null;
     }
 
     get player() { return this.player_; }
     get weapons() { return this.weapons_; }
     get enems() { return this.enems_; }
     get map() { return this.map_; }
+    get playRoom() { return this.playRoom_; }
+    set playRoom(room) { this.playRoom_ = room; }
 
     startNewGame() {
         this.level_ = 1;
-        this.weapons_ = [];
 
         this.generatePlayer();
         this.generateLevel();
+        this.placeEntities();
     }
 
     generateLevel() {
@@ -84,6 +87,7 @@ export class GameEngine {
         
         const randomIndex = Math.floor(Math.random() * notViewRooms.length);
         const randomRoom = notViewRooms[randomIndex];
+        this.playRoom_ = randomRoom;
         
         notViewRooms.splice(randomIndex, 1);
         viewRooms.push(randomRoom);
