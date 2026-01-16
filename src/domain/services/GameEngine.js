@@ -82,30 +82,28 @@ export class GameEngine {
     }
 
     placePlayer() {
-        const notViewRooms = this.map_.notViewRooms;
-        const viewRooms = this.map_.viewRooms;
+        const rooms = this.map_.rooms;
         
-        const randomIndex = Math.floor(Math.random() * notViewRooms.length);
-        const randomRoom = notViewRooms[randomIndex];
+        const randomIndex = Math.floor(Math.random() * rooms.length);
+        const randomRoom = rooms[randomIndex];
         this.playRoom_ = randomRoom;
+        rooms.splice(randomIndex, 1);
         
-        notViewRooms.splice(randomIndex, 1);
-        viewRooms.push(randomRoom);
-
         const availableCells = randomRoom.findAvailableCells();
         const startPosition = availableCells[Math.floor(Math.random() * availableCells.length)];
-
+        
         this.player_.x = startPosition.x;
         this.player_.y = startPosition.y;
-
+        
         randomRoom.setEntitiesInGrid(this.player_, startPosition);
+        this.map_.drawRoom(randomRoom);
     }
 
     placeWeapons() {
         while(this.weapons_.length > 0) {
-            const notViewRooms = this.map_.notViewRooms;
-            const randomRoomsIndex = Math.floor(Math.random() * notViewRooms.length);
-            const randomRoom = notViewRooms[randomRoomsIndex];
+            const rooms = this.map_.rooms;
+            const randomRoomsIndex = Math.floor(Math.random() * rooms.length);
+            const randomRoom = rooms[randomRoomsIndex];
 
             const weapon = this.weapons_.pop();
 
@@ -121,9 +119,9 @@ export class GameEngine {
 
     placeEnems() {
         while(this.enems_.length > 0) {
-            const notViewRooms = this.map_.notViewRooms;
-            const randomRoomsIndex = Math.floor(Math.random() * notViewRooms.length);
-            const randomRoom = notViewRooms[randomRoomsIndex];
+            const rooms = this.map_.rooms;
+            const randomRoomsIndex = Math.floor(Math.random() * rooms.length);
+            const randomRoom = rooms[randomRoomsIndex];
 
             const enemy = this.enems_.pop();
 

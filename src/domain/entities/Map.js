@@ -15,11 +15,14 @@ const MAP_HEIGHT = ROOMS_IN_HEIGHT * REGION_HEIGHT;
 
 
 import { Room } from "./Room.js"
+import { Weapon } from "../entities/Weapon.js"
+import { Enemy } from "../entities/Enemy.js"
+import { Player } from "../entities/Player.js"  
 
 export class Map {
     constructor() {
-        this.viewRooms_ = [];
-        this.notViewRooms_ = [];
+        // this.viewRooms_ = [];
+        // this.notViewRooms_ = [];
 
         this.grid_ = Array.from(
             { length: MAP_HEIGHT },
@@ -43,22 +46,24 @@ export class Map {
         // console.log(this.grid_);
     }
 
-    /**
-     * @returns { Array<Room> }
-     */
-    get viewRooms() { return this.viewRooms_; }
+    // /**
+    //  * @returns { Array<Room> }
+    //  */
+    // get viewRooms() { return this.viewRooms_; }
 
-    /**
-     * @returns { Array<Room> }
-     */
-    get notViewRooms() { return this.notViewRooms_; }
+    // /**
+    //  * @returns { Array<Room> }
+    //  */
+    // get notViewRooms() { return this.notViewRooms_; }
+
+    get rooms() { return this.rooms_; }
 
     generateRooms() {
         for(let i = 0; i < ROOMS_NUM; i++) {
             const roomWidth = Math.floor(Math.random() * (MAX_ROOM_WIDTH - MIN_ROOM_WIDTH + 1) + MIN_ROOM_WIDTH);
             const roomHeight = Math.floor(Math.random() * (MAX_ROOM_HEIGHT - MIN_ROOM_HEIGHT + 1) + MIN_ROOM_HEIGHT);
             const room = new Room(roomWidth, roomHeight);
-            this.notViewRooms_.push(room);
+            this.rooms_.push(room);
         }
     }
 
@@ -68,7 +73,7 @@ export class Map {
         for (let ry = 0; ry < ROOMS_IN_HEIGHT; ry++) {
             for (let rx = 0; rx < ROOMS_IN_WIDTH; rx++) {
 
-                const room = this.notViewRooms_[index++];
+                const room = this.rooms_[index++];
 
                 const offsetX = rx * REGION_WIDTH;
                 const offsetY = ry * REGION_HEIGHT;
@@ -82,28 +87,29 @@ export class Map {
 
                 room.mapX = x;
                 room.mapY = y;
-
-                this.rooms_.push(room);
-                this.drawRoom(room);
             }
         }
     }
+
     drawRoom(room) {
         for (let y = 0; y < room.height; y++) {
             for (let x = 0; x < room.width; x++) {
-
-                const cell = room.grid[y][x];
                 const mapX = room.mapX + x;
                 const mapY = room.mapY + y;
-
-                if (cell === 1) {
-                    this.grid_[mapY][mapX] = '#';
+                if(room.grid[y][x] === 1) {
+                    this.grid_[mapY][mapX] = "#";
+                } else if(room.grid[y][x] instanceof Enemy) {
+                    this.grid_[mapY][mapX] = "E";
+                } else if(room.grid[y][x] instanceof Weapon) {
+                    this.grid_[mapY][mapX] = "W";
+                } else if(room.grid[y][x] instanceof Player) {
+                    this.grid_[mapY][mapX] = "P";
                 } else {
-                    this.grid_[mapY][mapX] = '.';
+                    this.grid_[mapY][mapX] = ".";
                 }
             }
         }
-}
+    }
 
     connectRooms() {
         for (let i = 1; i < this.rooms_.length; i++) {
@@ -125,7 +131,7 @@ export class Map {
     hCorridor(x1, x2, y) {
         for (let x = Math.min(x1, x2); x <= Math.max(x1, x2); x++) {
             if (this.grid_[y][x] === ' ') {
-                this.grid_[y][x] = '+';
+                // this.grid_[y][x] = '+';
             }
         }
     }
@@ -133,7 +139,7 @@ export class Map {
     vCorridor(y1, y2, x) {
         for (let y = Math.min(y1, y2); y <= Math.max(y1, y2); y++) {
             if (this.grid_[y][x] === ' ') {
-                this.grid_[y][x] = '+';
+                // this.grid_[y][x] = '+';
             }
         }
     }
