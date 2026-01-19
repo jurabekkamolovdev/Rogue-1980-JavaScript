@@ -6,7 +6,7 @@ export class Room {
     constructor(width, height) {
         this.width_ = width;
         this.height_ = height;
-
+        this.entities_ = []
         this.mapX_ = 0;
         this.mapY_ = 0;
 
@@ -15,6 +15,7 @@ export class Room {
             () => Array(width).fill(0)
         );
         this.setWalls();
+
     }
 
     get width() { return this.width_; }
@@ -28,13 +29,27 @@ export class Room {
     get mapY() { return this.mapY_; }
     set mapY(value) { this.mapY_ = value; }
 
+
     /**
      * 
-     * @param {any} value 
-     * @param {{x: number, y: number}} position 
+     * @param {any} entity 
      */
-    setEntitiesInGrid(value, position) {
-        this.grid_[position.y][position.x] = value;
+    appendEntitiesInRoom(entity) {
+        this.grid_[entity.y][entity.x] = entity;
+    }
+
+    refreshRoom() {
+        for(let i = 0; i < this.height_; i++) {
+            for(let j = 0; j < this.width_; j++) {
+                if( (this.grid_[i][j] !== 0) && (this.grid_[i][j] !== 1) ) {
+                    const entity = this.grid_[i][j];
+                    if( (i !== entity.y) || (j !== entity.x) ) {
+                        this.grid_[i][j] = 0;
+                        this.grid[entity.y][entity.x] = entity;
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -58,7 +73,7 @@ export class Room {
             for(let j = 0; j < this.width_; j++) {
                 if(i === 0 || j === 0 || i === this.height_ - 1 || j === this.width_ - 1) {
                     this.grid_[i][j] = 1;
-                }
+                } 
             }
         }
     }

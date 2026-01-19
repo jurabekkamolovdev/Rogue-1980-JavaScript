@@ -4,8 +4,8 @@
 import { WEAPON_TYPES, Weapon } from "../entities/Weapon.js"
 import { ENEMY_TYPES, Enemy } from "../entities/Enemy.js"
 import { Map } from "../entities/Map.js"
-import { Player } from "../entities/Player.js"  
-
+import { Player } from "../entities/Player.js"
+import { GameUI } from "../../presentation/GameUI.js"
 export class GameEngine {
     constructor() {
         this.player_ = null;
@@ -14,6 +14,8 @@ export class GameEngine {
         this.map_ = null;
         this.level_ = 1;
         this.playRoom_ = null;
+
+        this.ui_ = new GameUI();
     }
 
     get player() { return this.player_; }
@@ -29,6 +31,9 @@ export class GameEngine {
         this.generatePlayer();
         this.generateLevel();
         this.placeEntities();
+        this.map.drawRooms();
+        this.ui_.renderMap(this.map_.grid);
+        this.setupControls();
     }
 
     generateLevel() {
@@ -82,7 +87,7 @@ export class GameEngine {
     }
 
     placePlayer() {
-        const rooms = this.map_.rooms;
+        const rooms = this.map_.notViewRooms;
         
         const randomIndex = Math.floor(Math.random() * rooms.length);
         const randomRoom = rooms[randomIndex];
@@ -95,13 +100,13 @@ export class GameEngine {
         this.player_.x = startPosition.x;
         this.player_.y = startPosition.y;
         
-        randomRoom.setEntitiesInGrid(this.player_, startPosition);
-        this.map_.drawRoom(randomRoom);
+        randomRoom.appendEntitiesInRoom(this.player_);
+        this.map_.viewRooms.push(randomRoom)
     }
 
     placeWeapons() {
         while(this.weapons_.length > 0) {
-            const rooms = this.map_.rooms;
+            const rooms = this.map_.notViewRooms;
             const randomRoomsIndex = Math.floor(Math.random() * rooms.length);
             const randomRoom = rooms[randomRoomsIndex];
 
@@ -113,13 +118,13 @@ export class GameEngine {
             weapon.x = startPosition.x;
             weapon.y = startPosition.y;
 
-            randomRoom.setEntitiesInGrid(weapon, startPosition);
+            randomRoom.appendEntitiesInRoom(weapon);
         }
     }
 
     placeEnems() {
         while(this.enems_.length > 0) {
-            const rooms = this.map_.rooms;
+            const rooms = this.map_.notViewRooms;
             const randomRoomsIndex = Math.floor(Math.random() * rooms.length);
             const randomRoom = rooms[randomRoomsIndex];
 
@@ -131,7 +136,33 @@ export class GameEngine {
             enemy.x = startPosition.x;
             enemy.y = startPosition.y;
 
-            randomRoom.setEntitiesInGrid(enemy, startPosition);
+            randomRoom.appendEntitiesInRoom(enemy);
         }
+    }
+
+    setupControls() {
+        this.ui_.screen.key(['up', 'w'], () => {
+            this.player_.move(0, -1);
+            this.map_.drawRooms();
+            this.ui_.renderMap(this.map_.grid);
+        });
+
+        this.ui_.screen.key(['down', 's'], () => {
+            this.player_.move(0, 1);
+            this.map_.drawRooms();
+            this.ui_.renderMap(this.map_.grid);
+        });
+
+        this.ui_.screen.key(['left', 'a'], () => {
+            this.player_.move(-1, 0);
+            this.map_.drawRooms();
+            this.ui_.renderMap(this.map_.grid);
+        });
+
+        this.ui_.screen.key(['right', 'd'], () => {
+            this.player_.move(1, 0);
+            this.map_.drawRooms();
+            this.ui_.renderMap(this.map_.grid);
+        });
     }
 }

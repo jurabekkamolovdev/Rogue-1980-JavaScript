@@ -21,42 +21,29 @@ import { Player } from "../entities/Player.js"
 
 export class Map {
     constructor() {
-        // this.viewRooms_ = [];
-        // this.notViewRooms_ = [];
+        this.viewRooms_ = [];
+        this.notViewRooms_ = [];
 
         this.grid_ = Array.from(
             { length: MAP_HEIGHT },
             () => Array(MAP_WIDTH).fill(' ')
         );
 
-        this.rooms_ = [];
         this.generateRooms();
         this.placeRooms();
-        this.connectRooms();
     }
 
-    printMap() {
-        for(let i = 0; i < MAP_HEIGHT; i++) {
-            let temp = ''
-            for(let j = 0; j < MAP_WIDTH; j++) {
-                temp += this.grid_[i][j];
-            }
-            console.log(temp); 
-        }
-        // console.log(this.grid_);
-    }
 
-    // /**
-    //  * @returns { Array<Room> }
-    //  */
-    // get viewRooms() { return this.viewRooms_; }
+    /**
+     * @returns { Array<Room> }
+     */
+    get viewRooms() { return this.viewRooms_; }
 
-    // /**
-    //  * @returns { Array<Room> }
-    //  */
-    // get notViewRooms() { return this.notViewRooms_; }
+    /**
+     * @returns { Array<Room> }
+     */
+    get notViewRooms() { return this.notViewRooms_; }
 
-    get rooms() { return this.rooms_; }
     get grid() { return this.grid_; }
 
     generateRooms() {
@@ -64,7 +51,7 @@ export class Map {
             const roomWidth = Math.floor(Math.random() * (MAX_ROOM_WIDTH - MIN_ROOM_WIDTH + 1) + MIN_ROOM_WIDTH);
             const roomHeight = Math.floor(Math.random() * (MAX_ROOM_HEIGHT - MIN_ROOM_HEIGHT + 1) + MIN_ROOM_HEIGHT);
             const room = new Room(roomWidth, roomHeight);
-            this.rooms_.push(room);
+            this.notViewRooms_.push(room);
         }
     }
 
@@ -74,7 +61,7 @@ export class Map {
         for (let ry = 0; ry < ROOMS_IN_HEIGHT; ry++) {
             for (let rx = 0; rx < ROOMS_IN_WIDTH; rx++) {
 
-                const room = this.rooms_[index++];
+                const room = this.notViewRooms[index++];
 
                 const offsetX = rx * REGION_WIDTH;
                 const offsetY = ry * REGION_HEIGHT;
@@ -92,55 +79,28 @@ export class Map {
         }
     }
 
-    drawRoom(room) {
-        for (let y = 0; y < room.height; y++) {
-            for (let x = 0; x < room.width; x++) {
-                const mapX = room.mapX + x;
-                const mapY = room.mapY + y;
-                if(room.grid[y][x] === 1) {
-                    this.grid_[mapY][mapX] = "#";
-                } else if(room.grid[y][x] instanceof Enemy) {
-                    this.grid_[mapY][mapX] = "E";
-                } else if(room.grid[y][x] instanceof Weapon) {
-                    this.grid_[mapY][mapX] = "W";
-                } else if(room.grid[y][x] instanceof Player) {
-                    this.grid_[mapY][mapX] = "@";
-                } else {
-                    this.grid_[mapY][mapX] = ".";
+    drawRooms() {
+        for(let i = 0; i < this.viewRooms_.length; i++) {
+            const room = this.viewRooms_[i];
+            room.refreshRoom();
+            
+            for(let ry = 0; ry < room.height; ry++) {
+                for(let rx = 0; rx < room.width; rx++) {
+                    const mapY = room.mapY + ry;
+                    const mapX = room.mapX + rx;
+                    
+                    if(room.grid[ry][rx] === 1) {
+                        this.grid_[mapY][mapX] = '1';
+                    } else if(room.grid[ry][rx] instanceof Enemy) {
+                        this.grid_[mapY][mapX] = room.grid[ry][rx].char;
+                    } else if(room.grid[ry][rx] instanceof Weapon) {
+                        this.grid_[mapY][mapX] = 'W';
+                    } else if(room.grid[ry][rx] instanceof Player) {
+                        this.grid_[mapY][mapX] = 'P';
+                    } else {
+                        this.grid_[mapY][mapX] = ' ';
+                    }
                 }
-            }
-        }
-    }
-
-    connectRooms() {
-        for (let i = 1; i < this.rooms_.length; i++) {
-            const prev = this.getCenter(this.rooms_[i - 1]);
-            const curr = this.getCenter(this.rooms_[i]);
-
-            this.hCorridor(prev.x, curr.x, prev.y);
-            this.vCorridor(prev.y, curr.y, curr.x);
-        }
-    }
-
-    getCenter(room) {
-        return {
-            x: room.mapX + Math.floor(room.width / 2),
-            y: room.mapY + Math.floor(room.height / 2)
-        };
-    }
-
-    hCorridor(x1, x2, y) {
-        for (let x = Math.min(x1, x2); x <= Math.max(x1, x2); x++) {
-            if (this.grid_[y][x] === ' ') {
-                // this.grid_[y][x] = '+';
-            }
-        }
-    }
-
-    vCorridor(y1, y2, x) {
-        for (let y = Math.min(y1, y2); y <= Math.max(y1, y2); y++) {
-            if (this.grid_[y][x] === ' ') {
-                // this.grid_[y][x] = '+';
             }
         }
     }
