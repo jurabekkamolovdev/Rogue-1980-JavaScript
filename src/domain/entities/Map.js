@@ -5,7 +5,7 @@ const ROOMS_IN_WIDTH = 3;
 const ROOMS_IN_HEIGHT = 3;
 const ROOMS_NUM = ROOMS_IN_HEIGHT * ROOMS_IN_WIDTH;
 const REGION_WIDTH = 65;
-const REGION_HEIGHT = 15;
+const REGION_HEIGHT = 13;
 const MIN_ROOM_WIDTH = 6;
 const MAX_ROOM_WIDTH = REGION_WIDTH - 2;
 const MIN_ROOM_HEIGHT = 5;
@@ -57,6 +57,7 @@ export class Map {
     // get notViewRooms() { return this.notViewRooms_; }
 
     get rooms() { return this.rooms_; }
+    get grid() { return this.grid_; }
 
     generateRooms() {
         for(let i = 0; i < ROOMS_NUM; i++) {
@@ -103,7 +104,7 @@ export class Map {
                 } else if(room.grid[y][x] instanceof Weapon) {
                     this.grid_[mapY][mapX] = "W";
                 } else if(room.grid[y][x] instanceof Player) {
-                    this.grid_[mapY][mapX] = "P";
+                    this.grid_[mapY][mapX] = "@";
                 } else {
                     this.grid_[mapY][mapX] = ".";
                 }
