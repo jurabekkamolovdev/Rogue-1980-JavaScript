@@ -133,7 +133,6 @@ export class Player {
      */
     getState() {
         return {
-            position: { x: this.x_, y: this.y_},
             stats: {
                 level: this.level_,
 
@@ -148,7 +147,9 @@ export class Player {
                 armor: this.armor_,
 
                 experience: this.experience_,
-                maxExperience: this.maxExperience_
+                maxExperience: this.maxExperience_,
+
+                weapon: this.equippedWeapon_ ? this.equippedWeapon_.type : null
             }
         }
     }

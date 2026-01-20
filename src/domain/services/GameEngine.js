@@ -26,13 +26,14 @@ export class GameEngine {
     set playRoom(room) { this.playRoom_ = room; }
 
     startNewGame() {
-        this.level_ = 1;
+        this.level_ = 5;
 
         this.generatePlayer();
         this.generateLevel();
         this.placeEntities();
         this.map.drawRooms();
         this.ui_.renderMap(this.map_.grid);
+        this.ui_.renderStats(this.player_);
         this.setupControls();
     }
 
@@ -182,6 +183,8 @@ export class GameEngine {
 
         // Enemy ustiga borishni oldini olish
         if(targetCell instanceof Enemy) {
+            this.moveEnemies();
+            this.ui_.renderStats(player);
             return;
         }
 
@@ -190,10 +193,9 @@ export class GameEngine {
             player.move(dx, dy);
             this.map_.drawRooms();
             this.ui_.renderMap(this.map_.grid);
-
-            // Dushmanlarni harakatlantirish
             this.moveEnemies();
         }
+        this.ui_.renderStats(player);
     }
 
     /**
@@ -212,38 +214,46 @@ export class GameEngine {
                 const enemyNewX = enemy.x + movePosition.dx;
                 const enemyNewY = enemy.y + movePosition.dy;
 
-                // Dushman uchun chegara tekshiruvi
-                if(enemyNewY < 0 || enemyNewY >= room.height || 
-                   enemyNewX < 0 || enemyNewX >= room.width) {
+                if(enemyNewY >= room.height || 
+                    enemyNewX >= room.width) {
                     continue;
                 }
 
-                const enemyTargetCell = room.grid[enemyNewY][enemyNewX];
-
-                // Agar oldida Player bo'lsa - hujum qiladi
-                if(enemyTargetCell instanceof Player) {
-                    const enemyDamage = enemy.attack();
-                    const isPlayerAlive = player.takeDamage(enemyDamage);
+                // const enemyTargetCell = room.grid[enemyNewY][enemyNewX];
+                
+                // if(enemyTargetCell instanceof Player) {
+                //     const enemyDamage = enemy.attack();
+                //     const isPlayerAlive = player.takeDamage(enemyDamage);
                     
-                    if(!isPlayerAlive) {
-                        this.ui_.renderMessage('Game Over! You died.');
+                //     if(!isPlayerAlive) {
+                //         this.ui_.renderMessage('Game Over! You died.');
+                //     }
+                //     continue;
+                // }
+                const distanceX = Math.abs(player.x - enemy.x);
+                const distanceY = Math.abs(player.y - enemy.y);
+                
+                if((distanceX === 1 && distanceY === 0) || (distanceY === 1 && distanceX === 0)){
+                        const enemyDamage = enemy.attack();
+                        const isPlayerAlive = player.takeDamage(enemyDamage);
+                        
+                        if(!isPlayerAlive) {
+                            this.ui_.renderMessage('Game Over! You died.');
+                        }
+                        continue;
                     }
-                    continue;
-                }
-
-                // Weapon ustiga chiqmaslik
+                
+                const enemyTargetCell = room.grid[enemyNewY][enemyNewX];
                 if(enemyTargetCell instanceof Weapon) {
                     continue;
                 }
 
-                // Faqat bo'sh joyga yuradi
                 if(enemyTargetCell === 0) {
                     enemy.move(movePosition.dx, movePosition.dy);
                 }
             }
         }
 
-        // Dushmanlar harakatlanganidan keyin qayta chizish
         this.map_.drawRooms();
         this.ui_.renderMap(this.map_.grid);
     }
