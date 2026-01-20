@@ -185,7 +185,7 @@ export class GameEngine {
         if(targetCell instanceof Enemy) {
             this.moveEnemies();
             this.ui_.renderStats(player);
-            return;
+            // return;
         }
 
         // Faqat bo'sh joyga yurish
