@@ -80,8 +80,8 @@ export class Map {
     }
 
     drawRooms() {
-        for(let i = 0; i < this.viewRooms_.length; i++) {
-            const room = this.viewRooms_[i];
+        for(let i = 0; i < this.notViewRooms.length; i++) {
+            const room = this.notViewRooms[i];
             room.refreshRoom();
             
             for(let ry = 0; ry < room.height; ry++) {
@@ -90,13 +90,13 @@ export class Map {
                     const mapX = room.mapX + rx;
                     
                     if(room.grid[ry][rx] === 1) {
-                        this.grid_[mapY][mapX] = '1';
+                        this.grid_[mapY][mapX] = '#';
                     } else if(room.grid[ry][rx] instanceof Enemy) {
                         this.grid_[mapY][mapX] = room.grid[ry][rx].char;
                     } else if(room.grid[ry][rx] instanceof Weapon) {
-                        this.grid_[mapY][mapX] = 'W';
+                        this.grid_[mapY][mapX] = ')';
                     } else if(room.grid[ry][rx] instanceof Player) {
-                        this.grid_[mapY][mapX] = 'P';
+                        this.grid_[mapY][mapX] = '@';
                     } else {
                         this.grid_[mapY][mapX] = ' ';
                     }

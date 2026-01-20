@@ -11,41 +11,46 @@ export const ENEMY_TYPES = {
 
 const ENEMY_STATS = {
     [ENEMY_TYPES.Zombie]: {
-        char: 'Z',
-        hpMin: 2, 
+        char: '{green-fg}{bold}Z{/bold}{/green-fg}',
+        hpMin: 2,
         hpMax: 16,
         dmgMin: 1,
         dmgMax: 2
     },
+
     [ENEMY_TYPES.Vampire]: {
-        char: 'V',
+        char: '{red-fg}{bold}V{/bold}{/red-fg}',
         hpMin: 1,
         hpMax: 8,
         dmgMin: 1,
         dmgMax: 3
     },
+
     [ENEMY_TYPES.Ghost]: {
-        char: 'G',
+        char: '{white-fg}{bold}G{/bold}{/white-fg}',
         hpMin: 1,
         hpMax: 8,
         dmgMin: 1,
         dmgMax: 2
     },
+
     [ENEMY_TYPES.Ogre]: {
-        char: 'O',
+        char: '{yellow-fg}{bold}O{/bold}{/yellow-fg}',
         hpMin: 2,
         hpMax: 16,
         dmgMin: 1,
         dmgMax: 6
     },
+
     [ENEMY_TYPES.Snake]: {
-        char: 'S',
+        char: '{cyan-fg}{bold}S{/bold}{/cyan-fg}',
         hpMin: 1,
         hpMax: 8,
         dmgMin: 1,
         dmgMax: 6
     }
-}
+};
+
 
 export class Enemy {
     constructor(type) {
@@ -94,12 +99,13 @@ export class Enemy {
         const dy = playerY - this.y_;
 
         if (Math.abs(dx) > Math.abs(dy)) {
-            return this.x_ + Math.sign(dx);
+            return { dx: Math.sign(dx), dy: 0 };
         }
-
         else if (Math.abs(dy) !== 0) {
-            return this.y_ + Math.sign(dy);
+            return { dx: 0, dy: Math.sign(dy) };
         }
+        
+        return { dx: 0, dy: 0 };
     }
 
     move(dx, dy) {

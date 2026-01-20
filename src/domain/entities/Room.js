@@ -101,24 +101,4 @@ export class Room {
     getEnems() {
         return this.grid_.flat().filter(en => en instanceof Enemy);
     }
-
-    printRoom() {
-        for(let i = 0; i < this.height_; i++) {
-            let temp = '';
-            for(let j = 0; j < this.width_; j++) {
-                if(this.grid_[i][j] === 1) {
-                    temp += '1';
-                } else if(this.grid_[i][j] instanceof Enemy) {
-                    temp += 'E';
-                } else if(this.grid_[i][j] instanceof Weapon) {
-                    temp += 'W';
-                } else if(this.grid_[i][j] instanceof Player) {
-                    temp += 'P';
-                } else {
-                    temp += ' ';
-                }
-            }
-            console.log(temp);
-        }
-    }
 }

@@ -92,7 +92,6 @@ export class GameEngine {
         const randomIndex = Math.floor(Math.random() * rooms.length);
         const randomRoom = rooms[randomIndex];
         this.playRoom_ = randomRoom;
-        rooms.splice(randomIndex, 1);
         
         const availableCells = randomRoom.findAvailableCells();
         const startPosition = availableCells[Math.floor(Math.random() * availableCells.length)];
@@ -101,7 +100,6 @@ export class GameEngine {
         this.player_.y = startPosition.y;
         
         randomRoom.appendEntitiesInRoom(this.player_);
-        this.map_.viewRooms.push(randomRoom)
     }
 
     placeWeapons() {
@@ -142,27 +140,111 @@ export class GameEngine {
 
     setupControls() {
         this.ui_.screen.key(['up', 'w'], () => {
-            this.player_.move(0, -1);
-            this.map_.drawRooms();
-            this.ui_.renderMap(this.map_.grid);
+            this.move(0, -1);
         });
 
         this.ui_.screen.key(['down', 's'], () => {
-            this.player_.move(0, 1);
-            this.map_.drawRooms();
-            this.ui_.renderMap(this.map_.grid);
+            this.move(0, 1);
         });
 
         this.ui_.screen.key(['left', 'a'], () => {
-            this.player_.move(-1, 0);
-            this.map_.drawRooms();
-            this.ui_.renderMap(this.map_.grid);
+            this.move(-1, 0);
         });
 
         this.ui_.screen.key(['right', 'd'], () => {
-            this.player_.move(1, 0);
+            this.move(1, 0);
+        });
+    }
+
+    move(dx, dy) {
+        const player = this.player_;
+        const room = this.playRoom_;
+
+        const newX = player.x + dx;
+        const newY = player.y + dy;
+
+        // Chegara tekshiruvi
+        if(newY < 0 || newY >= room.height || newX < 0 || newX >= room.width) {
+            return;
+        }
+
+        const targetCell = room.grid[newY][newX];
+
+        // Devor tekshiruvi
+        if(targetCell === 1) {
+            return;
+        }
+
+        // Qurolga tegmaslik
+        if(targetCell instanceof Weapon) {
+            return;
+        }
+
+        // Enemy ustiga borishni oldini olish
+        if(targetCell instanceof Enemy) {
+            return;
+        }
+
+        // Faqat bo'sh joyga yurish
+        if(targetCell === 0) {
+            player.move(dx, dy);
             this.map_.drawRooms();
             this.ui_.renderMap(this.map_.grid);
-        });
+
+            // Dushmanlarni harakatlantirish
+            this.moveEnemies();
+        }
+    }
+
+    /**
+     * Barcha dushmanlarni harakatlantirish
+     */
+    moveEnemies() {
+        const room = this.playRoom_;
+        const player = this.player_;
+        const enems = room.getEnems();
+
+        if(enems.length > 0) {
+            for(let i = 0; i < enems.length; i++) {
+                const enemy = enems[i];
+                const movePosition = enemy.calculateMove(player.x, player.y);
+                
+                const enemyNewX = enemy.x + movePosition.dx;
+                const enemyNewY = enemy.y + movePosition.dy;
+
+                // Dushman uchun chegara tekshiruvi
+                if(enemyNewY < 0 || enemyNewY >= room.height || 
+                   enemyNewX < 0 || enemyNewX >= room.width) {
+                    continue;
+                }
+
+                const enemyTargetCell = room.grid[enemyNewY][enemyNewX];
+
+                // Agar oldida Player bo'lsa - hujum qiladi
+                if(enemyTargetCell instanceof Player) {
+                    const enemyDamage = enemy.attack();
+                    const isPlayerAlive = player.takeDamage(enemyDamage);
+                    
+                    if(!isPlayerAlive) {
+                        this.ui_.renderMessage('Game Over! You died.');
+                    }
+                    continue;
+                }
+
+                // Weapon ustiga chiqmaslik
+                if(enemyTargetCell instanceof Weapon) {
+                    continue;
+                }
+
+                // Faqat bo'sh joyga yuradi
+                if(enemyTargetCell === 0) {
+                    enemy.move(movePosition.dx, movePosition.dy);
+                }
+            }
+        }
+
+        // Dushmanlar harakatlanganidan keyin qayta chizish
+        this.map_.drawRooms();
+        this.ui_.renderMap(this.map_.grid);
     }
 }

@@ -30,6 +30,7 @@ export class GameUI {
             width: '100%',
             height: '10%',
             content: '',
+            tags: true,
             style: {
                 fg: 'white',
                 bg: 'black',
@@ -45,6 +46,7 @@ export class GameUI {
             width: '100%',
             height: '80%',
             content: '',
+            tags: true,
             style: {
                 fg: 'white',
                 bg: 'black',
@@ -59,6 +61,7 @@ export class GameUI {
             left: 0,
             width: '100%',
             height: '10%',
+            tags: true,
             style: {
                 fg: 'white',
                 bg: 'black',
@@ -88,10 +91,16 @@ export class GameUI {
             const array = map[i];
             for(let j = 0; j < array.length; j++) {
                 line += array[j];
+                
             }
             mapContent += line + '\n';
         }
         this.mapBox_.setContent(mapContent);
+        this.screen.render();
+    }
+
+    renderMessage() {
+        this.messageBox_.setContent(`{cem}Hello`);
         this.screen.render();
     }
 }
