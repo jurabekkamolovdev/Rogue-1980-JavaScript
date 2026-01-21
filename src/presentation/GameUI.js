@@ -8,6 +8,7 @@ export class GameUI {
         this.messageBox_ = null;
         this.mapBox_ = null;
         this.statsBox_ = null;
+        this.statBoxes_ = [];
 
         this.initScreen();
         this.initBoxes();
@@ -22,57 +23,73 @@ export class GameUI {
     }
 
     initBoxes() {
+        // Message box
         this.messageBox_ = blessed.box({
             top: 0,
             left: 0,
             width: '100%',
-            height: '10%',
+            height: 3,
             content: '',
             tags: true,
             style: {
                 fg: 'white',
-                bg: 'black',
-                border: {
-                    fg: 'cyan'
-                }
+                bg: 'black'
             }
         });
 
+        // Map box
         this.mapBox_ = blessed.box({
-            top: '10%',
+            top: 3,
             left: 0,
             width: '100%',
-            height: '80%',
+            height: '100%-6',
             content: '',
             tags: true,
             style: {
                 fg: 'white',
-                bg: 'black',
-                border: {
-                    fg: 'cyan'
-                }
+                bg: 'black'
             }
         });
 
+        // Stats container box
         this.statsBox_ = blessed.box({
-            top: '90%',
+            bottom: 0,
             left: 0,
             width: '100%',
-            height: '10%',
+            height: 3,
             tags: true,
             content: '',
             style: {
                 fg: 'white',
-                bg: 'black',
-                border: {
-                    fg: 'yellow'
-                }
+                bg: 'black'
             }
         });
 
+        // Append main boxes to screen first
         this.screen.append(this.messageBox_);
         this.screen.append(this.mapBox_);
         this.screen.append(this.statsBox_);
+
+        // Now create stat boxes inside statsBox_
+        const statLabels = ['HP', 'Str', 'Exp', 'Wen', 'Gold', 'Level'];
+        const statWidth = Math.floor(100 / 6);
+
+        for (let i = 0; i < 6; i++) {
+            const statBox = blessed.box({
+                parent: this.statsBox_,
+                top: 0,
+                left: `${i * statWidth}%`,
+                width: `${statWidth}%`,
+                height: '100%',
+                content: `{center}${statLabels[i]}: ---{/center}`,
+                tags: true,
+                style: {
+                    fg: 'white',
+                    bg: 'black'
+                }
+            });
+            this.statBoxes_.push(statBox);
+        }
     }
 
     setupKeyHandlers() {
@@ -104,30 +121,32 @@ export class GameUI {
         const state = player.getState();
         const { stats } = state;
         
-        // HP
         const hpColor = stats.currentHealth < 4 ? 'red' : 'green';
-        const hpText = `HP: {${hpColor}-fg}{bold}${stats.currentHealth}{/bold}{/${hpColor}-fg}/{bold}${stats.maxHealth}{/bold}`;
+        this.statBoxes_[0].setContent(
+            `{center}HP: {${hpColor}-fg}{bold}${stats.currentHealth}{/bold}{/${hpColor}-fg}/{bold}${stats.maxHealth}{/bold}{/center}`
+        );
 
-        // Kuch
-        const strText = `Str: {bold}${stats.currentStrength}{/bold}/{bold}${stats.maxStrength}{/bold}`;
+        this.statBoxes_[1].setContent(
+            `{center}Str: {bold}${stats.currentStrength}{/bold}/{bold}${stats.maxStrength}{/bold}{/center}`
+        );
 
-        // Qurol
+        this.statBoxes_[2].setContent(
+            `{center}Exp: {magenta-fg}{bold}${stats.experience}{/bold}{/magenta-fg}/{bold}${stats.maxExperience}{/bold}{/center}`
+        );
+
         const weaponText = stats.weapon ? stats.weapon : 'Yo\'q';
-        const weaponDisplay = `Weapon: {yellow-fg}{bold}${weaponText}{/bold}{/yellow-fg}`;
+        this.statBoxes_[3].setContent(
+            `{center}Wen: {yellow-fg}{bold}${weaponText}{/bold}{/yellow-fg}{/center}`
+        );
 
-        // Oltin
-        const goldDisplay = `Gold: {yellow-fg}{bold}${stats.gold}{/bold}{/yellow-fg}`;
+        this.statBoxes_[4].setContent(
+            `{center}Gold: {yellow-fg}{bold}${stats.gold}{/bold}{/yellow-fg}{/center}`
+        );
 
-        // Daraja
-        const levelDisplay = `Level: {cyan-fg}{bold}${stats.level}{/bold}{/cyan-fg}`;
+        this.statBoxes_[5].setContent(
+            `{center}Level: {cyan-fg}{bold}${stats.level}{/bold}{/cyan-fg}{/center}`
+        );
 
-        // Tajriba
-        const expDisplay = `Exp: {magenta-fg}{bold}${stats.experience}{/bold}{/magenta-fg}/{bold}${stats.maxExperience}{/bold}`;
-
-        // Barcha ma'lumotlarni bitta qatorda ko'rsatish
-        const statsContent = `  ${hpText}  |  ${strText}  |  ${weaponDisplay}  |  ${goldDisplay}  |  ${levelDisplay}  |  ${expDisplay}  `;
-
-        this.statsBox_.setContent(statsContent);
         this.screen.render();
     }
 }
