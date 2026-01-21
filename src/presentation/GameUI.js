@@ -23,7 +23,6 @@ export class GameUI {
     }
 
     initBoxes() {
-        // Message box
         this.messageBox_ = blessed.box({
             top: 0,
             left: 0,
@@ -36,10 +35,8 @@ export class GameUI {
                 bg: 'black'
             }
         });
-
-        // Map box
         this.mapBox_ = blessed.box({
-            top: 3,
+            top: 6,
             left: 0,
             width: '100%',
             height: '100%-6',
@@ -51,7 +48,6 @@ export class GameUI {
             }
         });
 
-        // Stats container box
         this.statsBox_ = blessed.box({
             bottom: 0,
             left: 0,
@@ -65,12 +61,10 @@ export class GameUI {
             }
         });
 
-        // Append main boxes to screen first
         this.screen.append(this.messageBox_);
         this.screen.append(this.mapBox_);
         this.screen.append(this.statsBox_);
 
-        // Now create stat boxes inside statsBox_
         const statLabels = ['HP', 'Str', 'Exp', 'Wen', 'Gold', 'Level'];
         const statWidth = Math.floor(100 / 6);
 
