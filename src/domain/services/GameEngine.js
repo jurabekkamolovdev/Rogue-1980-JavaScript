@@ -164,43 +164,25 @@ export class GameEngine {
         const newX = player.x + dx;
         const newY = player.y + dy;
 
-        // Chegara tekshiruvi
-        if(newY < 0 || newY >= room.height || newX < 0 || newX >= room.width) {
-            return;
-        }
-
         const targetCell = room.grid[newY][newX];
 
-        // Devor tekshiruvi
-        if(targetCell === 1) {
-            return;
-        }
-
-        // Qurolga tegmaslik
-        if(targetCell instanceof Weapon) {
-            return;
-        }
-
-        // Enemy ustiga borishni oldini olish
-        if(targetCell instanceof Enemy) {
-            this.moveEnemies();
-            this.ui_.renderStats(player);
-            // return;
-        }
-
-        // Faqat bo'sh joyga yurish
         if(targetCell === 0) {
-            player.move(dx, dy);
-            this.map_.drawRooms();
-            this.ui_.renderMap(this.map_.grid);
-            this.moveEnemies();
+            player.move(dx, dy); 
+        } else {
+            if(targetCell instanceof Enemy) {
+                const damage = player.attack();
+                const isEnemyAlive = targetCell.takeDamage(damage);
+                if(!isEnemyAlive) {
+                    room.grid[newY][newX] = 0;
+                }
+            }
         }
+        this.moveEnemies();
+        this.map_.drawRooms();
+        this.ui_.renderMap(this.map_.grid);
         this.ui_.renderStats(player);
     }
 
-    /**
-     * Barcha dushmanlarni harakatlantirish
-     */
     moveEnemies() {
         const room = this.playRoom_;
         const player = this.player_;
@@ -219,17 +201,6 @@ export class GameEngine {
                     continue;
                 }
 
-                // const enemyTargetCell = room.grid[enemyNewY][enemyNewX];
-                
-                // if(enemyTargetCell instanceof Player) {
-                //     const enemyDamage = enemy.attack();
-                //     const isPlayerAlive = player.takeDamage(enemyDamage);
-                    
-                //     if(!isPlayerAlive) {
-                //         this.ui_.renderMessage('Game Over! You died.');
-                //     }
-                //     continue;
-                // }
                 const distanceX = Math.abs(player.x - enemy.x);
                 const distanceY = Math.abs(player.y - enemy.y);
                 
@@ -244,9 +215,6 @@ export class GameEngine {
                     }
                 
                 const enemyTargetCell = room.grid[enemyNewY][enemyNewX];
-                if(enemyTargetCell instanceof Weapon) {
-                    continue;
-                }
 
                 if(enemyTargetCell === 0) {
                     enemy.move(movePosition.dx, movePosition.dy);
@@ -254,7 +222,5 @@ export class GameEngine {
             }
         }
 
-        this.map_.drawRooms();
-        this.ui_.renderMap(this.map_.grid);
     }
 }
