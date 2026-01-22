@@ -140,21 +140,43 @@ export class GameEngine {
     }
 
     setupControls() {
-        this.ui_.screen.key(['up', 'w'], () => {
+        this.ui_.screen.key(['up', 'W', 'w'], () => {
             this.move(0, -1);
         });
 
-        this.ui_.screen.key(['down', 's'], () => {
+        this.ui_.screen.key(['down', 'S', 's'], () => {
             this.move(0, 1);
         });
 
-        this.ui_.screen.key(['left', 'a'], () => {
+        this.ui_.screen.key(['left', 'A', 'a'], () => {
             this.move(-1, 0);
         });
 
-        this.ui_.screen.key(['right', 'd'], () => {
+        this.ui_.screen.key(['right', 'D', 'd'], () => {
             this.move(1, 0);
         });
+
+        this.ui_.screen.key(['G', 'g'] , () => {
+            this.getItem();
+        })
+    }
+
+    getItem() {
+        const player = this.player_;
+        const room = this.playRoom_;
+
+        const weapons = room.getWeapons();
+        let countWeapons = weapons.length;
+        let weaponIndex = 0;
+        while(countWeapons > weaponIndex) {
+            const distanceX = Math.abs(player.x - weapons[weaponIndex].x);
+            const distanceY = Math.abs(player.y - weapons[weaponIndex].y);
+            if((distanceX === 1 && distanceY === 0) || (distanceY === 1 && distanceX === 0)) {
+                this.ui_.messages_.push(`Weapon ${weapons[weaponIndex].type}`)
+            }
+            weaponIndex++;
+        }
+        this.ui_.renderMessage();
     }
 
     move(dx, dy) {

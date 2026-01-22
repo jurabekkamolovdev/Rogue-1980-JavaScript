@@ -19,8 +19,9 @@ export class GameUI {
     initScreen() {
         this.screen = blessed.screen({
             smartCSR: true,
-            title: 'Rogue 1980'
+            title: 'Rogue 1980',
         });
+        process.stdout.write('\x1B[?25l');
     }
 
     initBoxes() {
@@ -46,7 +47,7 @@ export class GameUI {
             style: {
                 fg: 'white',
                 bg: 'black'
-            }
+            },
         });
 
         this.statsBox_ = blessed.box({
@@ -104,6 +105,7 @@ export class GameUI {
             mapContent += line + '\n';
         }
         this.mapBox_.setContent(mapContent);
+        this.screen.program.hideCursor();
         this.screen.render();
     }
 
