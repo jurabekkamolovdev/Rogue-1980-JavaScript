@@ -9,6 +9,7 @@ export class GameUI {
         this.mapBox_ = null;
         this.statsBox_ = null;
         this.statBoxes_ = [];
+        this.messages_ = [];
 
         this.initScreen();
         this.initBoxes();
@@ -106,9 +107,21 @@ export class GameUI {
         this.screen.render();
     }
 
-    renderMessage(message) {
-        this.messageBox_.setContent(`{center}${message}{/center}`);
-        this.screen.render();
+    renderMessage() {
+        let message = '';
+        if(this.messages_.length > 1) {
+            while(this.messages_.length > 0) {
+                const line = `{center}${this.messages_.shift()}{/center}\n`
+                message += line;
+            }
+        } else if(this.messages_.length === 1) {
+            message += `{center}${this.messages_.shift()}{/center}\n`
+        }
+        
+        if(message) {
+            this.messageBox_.setContent(message);
+            this.screen.render();
+        }
     }
 
     renderStats(player) {

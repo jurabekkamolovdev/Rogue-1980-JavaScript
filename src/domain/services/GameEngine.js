@@ -172,13 +172,16 @@ export class GameEngine {
             if(targetCell instanceof Enemy) {
                 const damage = player.attack();
                 const isEnemyAlive = targetCell.takeDamage(damage);
+                this.ui_.messages_.push(`You hit the ${targetCell.type}`);
                 if(!isEnemyAlive) {
                     room.grid[newY][newX] = 0;
+                    this.ui_.messages_.push(`You defeated the ${targetCell.type}`);
                 }
             }
         }
         this.moveEnemies();
         this.map_.drawRooms();
+        this.ui_.renderMessage();
         this.ui_.renderMap(this.map_.grid);
         this.ui_.renderStats(player);
     }
@@ -207,7 +210,8 @@ export class GameEngine {
                 if((distanceX === 1 && distanceY === 0) || (distanceY === 1 && distanceX === 0)){
                         const enemyDamage = enemy.attack();
                         const isPlayerAlive = player.takeDamage(enemyDamage);
-                        
+                        this.ui_.messages_.push(`The ${enemy.type} hits you!`);
+                        // this.ui_.renderMessage(`The ${enemy.type} hits you!`);
                         if(!isPlayerAlive) {
                             this.ui_.renderMessage('Game Over! You died.');
                         }
