@@ -153,7 +153,7 @@ export class GameUI {
             `{center}Exp: {magenta-fg}{bold}${stats.experience}{/bold}{/magenta-fg}/{bold}${stats.maxExperience}{/bold}{/center}`
         );
 
-        const weaponText = stats.weapon ? stats.weapon : 'Yo\'q';
+        const weaponText = stats.weapon ? stats.weapon : 'No';
         this.statBoxes_[3].setContent(
             `{center}Wen: {yellow-fg}{bold}${weaponText}{/bold}{/yellow-fg}{/center}`
         );
