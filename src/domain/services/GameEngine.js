@@ -157,26 +157,49 @@ export class GameEngine {
         });
 
         this.ui_.screen.key(['G', 'g'] , () => {
-            this.getItem();
+            this.getWeapon();
+        })
+
+        this.ui_.screen.key(['i', 'I'], () => {
+            this.openInventor();
         })
     }
 
-    getItem() {
+    openInventor() {
+        const player = this.player_;
+        const playerInventors = player.inventory;
+        for(let i = 0; i < playerInventors.length; i++) {
+            this.ui_.messages_.push(`${i + 1}) ${playerInventors[i].char}`);
+        }
+
+        this.moveEnemies();
+        this.map_.drawRooms();
+        this.ui_.renderMessage();
+        this.ui_.renderMap(this.map_.grid);
+        this.ui_.renderStats(player);
+    }
+
+    getWeapon() {
         const player = this.player_;
         const room = this.playRoom_;
 
         const weapons = room.getWeapons();
-        let countWeapons = weapons.length;
-        let weaponIndex = 0;
-        while(countWeapons > weaponIndex) {
-            const distanceX = Math.abs(player.x - weapons[weaponIndex].x);
-            const distanceY = Math.abs(player.y - weapons[weaponIndex].y);
+        weapons.forEach(weapon => {
+            const distanceX = Math.abs(player.x - weapon.x);
+            const distanceY = Math.abs(player.y - weapon.y);
             if((distanceX === 1 && distanceY === 0) || (distanceY === 1 && distanceX === 0)) {
-                this.ui_.messages_.push(`Weapon ${weapons[weaponIndex].type}`)
+                // player.equippedWeapon = weapon;
+                player.inventory.push(weapon);
+                room.grid[weapon.y][weapon.x] = 0;
+                this.ui_.messages_.push(`Weapon ${weapon.char} equipped!`);
             }
-            weaponIndex++;
-        }
+        });
+        
+        this.moveEnemies();
+        this.map_.drawRooms();
         this.ui_.renderMessage();
+        this.ui_.renderMap(this.map_.grid);
+        this.ui_.renderStats(player);
     }
 
     move(dx, dy) {
@@ -194,7 +217,7 @@ export class GameEngine {
             if(targetCell instanceof Enemy) {
                 const damage = player.attack();
                 const isEnemyAlive = targetCell.takeDamage(damage);
-                this.ui_.messages_.push(`You hit the ${targetCell.type}`);
+                this.ui_.messages_.push(`You hit the ${targetCell.type} damage ${damage}`);
                 if(!isEnemyAlive) {
                     room.grid[newY][newX] = 0;
                     this.ui_.messages_.push(`You defeated the ${targetCell.type}`);

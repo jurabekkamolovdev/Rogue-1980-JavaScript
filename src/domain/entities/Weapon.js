@@ -12,13 +12,13 @@ export const WEAPON_TYPES = {
 }
 
 const WEAPON_STATS = {
-    [WEAPON_TYPES.MACE]: { min: 2, max: 3},
-    [WEAPON_TYPES.BOW]: { min: 1, max: 1},
-    [WEAPON_TYPES.ARROW]: { min: 1, max: 3},
-    [WEAPON_TYPES.DART]: { min: 1, max: 2},
-    [WEAPON_TYPES.TWOHANDED_SWORD]: { min: 3, max: 10},
-    [WEAPON_TYPES.DAGGER]: { min: 1, max: 4},
-    [WEAPON_TYPES.SPEAR]: { min: 2, max: 5}
+    [WEAPON_TYPES.MACE]: { min: 2, max: 3, char: 'Mace'},
+    [WEAPON_TYPES.BOW]: { min: 1, max: 1, char: 'Bow'},
+    [WEAPON_TYPES.ARROW]: { min: 1, max: 3, char: 'Arrow'},
+    [WEAPON_TYPES.DART]: { min: 1, max: 2, char: 'Dart'},
+    [WEAPON_TYPES.TWOHANDED_SWORD]: { min: 3, max: 10, char: 'Tw Sword'},
+    [WEAPON_TYPES.DAGGER]: { min: 1, max: 4, char: 'Dagger'},
+    [WEAPON_TYPES.SPEAR]: { min: 2, max: 5, char: 'Spear'}
 };
 
 
@@ -49,6 +49,10 @@ export class Weapon {
 
     get equipped() { return this.equipped_; }
     set equipped(value) { this.equipped_ = value; }
+
+    get char() {
+        return WEAPON_STATS[this.type].char
+    }
 
     /**
      * 

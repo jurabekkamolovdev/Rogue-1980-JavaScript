@@ -110,20 +110,30 @@ export class GameUI {
     }
 
     renderMessage() {
+        if(this.messages_.length === 0) return;
+        
         let message = '';
-        if(this.messages_.length > 1) {
-            while(this.messages_.length > 0) {
-                const line = `{center}${this.messages_.shift()}{/center}\n`
-                message += line;
+        const totalMessages = this.messages_.length;
+        const itemsPerRow = 3;
+        let row = '';
+        let rowCount = 0;
+        
+        for(let i = 0; i < totalMessages; i++) {
+            const msg = this.messages_.shift();
+            rowCount++;
+            
+            if(rowCount === itemsPerRow || i === totalMessages - 1) {
+                row += msg;
+                message += `{center}${row}{/center}\n`;
+                row = '';
+                rowCount = 0;
+            } else {
+                row += msg + ' | ';
             }
-        } else if(this.messages_.length === 1) {
-            message += `{center}${this.messages_.shift()}{/center}\n`
         }
         
-        if(message) {
-            this.messageBox_.setContent(message);
-            this.screen.render();
-        }
+        this.messageBox_.setContent(message);
+        this.screen.render();
     }
 
     renderStats(player) {

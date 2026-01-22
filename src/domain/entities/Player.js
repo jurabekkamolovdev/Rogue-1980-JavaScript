@@ -63,6 +63,8 @@ export class Player {
 
     get level() { return this.level_; }
 
+    get inventory() { return this.inventory_; }
+
     /**
      * 
      * @param {number} dx 
@@ -149,7 +151,7 @@ export class Player {
                 experience: this.experience_,
                 maxExperience: this.maxExperience_,
 
-                weapon: this.equippedWeapon_ ? this.equippedWeapon_.type : null
+                weapon: this.equippedWeapon_ ? this.equippedWeapon_.char : null
             }
         }
     }
