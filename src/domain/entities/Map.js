@@ -40,55 +40,105 @@ export class Map {
 
     get grid() { return this.grid_; }
 
+
     generateCorridor() {
-        const rooms = this.rooms_;
-        let temp = 0;
-        for(let i = 0; i < 3; i++) {
-            for(let j = 0; j < 2; j++) {
-                const indexRoom = i + j + temp;
-                const firstRoom = rooms[indexRoom];
-                const secondRoom = rooms[indexRoom + 1];
+    const rooms = this.rooms_;
+    
+    const horizontalPairs = [
+        [0, 1],
+        [1, 2],
+        [3, 4],
+        [4, 5],
+        [6, 7],
+        [7, 8] 
+    ];
 
-                const firstRoomRandomY = Math.floor(Math.random() * (firstRoom.height - 2)) + 1;
-                const secondRoomRandomY = Math.floor(Math.random() * (secondRoom.height - 2)) + 1;
+    for(const [leftIndex, rightIndex] of horizontalPairs) {
+        const leftRoom = rooms[leftIndex];
+        const rightRoom = rooms[rightIndex];
 
-                const firstRoomX = firstRoom.width;
-                const secondRoomX = 0;
-                
-                const firstRoomMapY = firstRoomRandomY + firstRoom.mapY;
-                const secondRoomMapY = secondRoomRandomY + secondRoom.mapY;
+        const leftRoomRandomY = Math.floor(Math.random() * (leftRoom.height - 2)) + 1;
+        const rightRoomRandomY = Math.floor(Math.random() * (rightRoom.height - 2)) + 1;
 
-                const firstRoomMapX = firstRoomX + firstRoom.mapX;
-                const secondRoomMapX = secondRoomX + secondRoom.mapX;
+        const leftRoomX = leftRoom.width;
+        const rightRoomX = 0;
+        
+        const leftRoomMapY = leftRoomRandomY + leftRoom.mapY;
+        const rightRoomMapY = rightRoomRandomY + rightRoom.mapY;
 
-                const firstHalfWay = Math.floor((firstRoomMapX + secondRoomMapX) / 2);
-                for(let f = firstRoomMapX; f < firstHalfWay; f++) {
-                    this.grid_[firstRoomMapY][f] = '#';
-                }
+        const leftRoomMapX = leftRoomX + leftRoom.mapX;
+        const rightRoomMapX = rightRoomX + rightRoom.mapX;
 
-                for(let f = secondRoomMapX; f > firstHalfWay; f--) {
-                    this.grid_[secondRoomMapY][f] = '#';
-                }
-
-
-                if(firstRoomMapY <= secondRoomMapY) {
-                    for(let f = firstRoomMapY; f <= secondRoomMapY; f++) {
-                        this.grid_[f][firstHalfWay] = '#';
-                    }
-                } else {
-                    for(let f = secondRoomMapY; f <= firstRoomMapY; f++) {
-                        this.grid_[f][firstHalfWay] = '#';
-                    }
-                }
-
-
-                
-
-
-            }
-            temp += 2;
+        const halfWay = Math.floor((leftRoomMapX + rightRoomMapX) / 2);
+        
+        // Horizontal line from left room
+        for(let x = leftRoomMapX; x < halfWay; x++) {
+            this.grid_[leftRoomMapY][x] = '#';
         }
 
+        // Horizontal line from right room
+        for(let x = rightRoomMapX; x > halfWay; x--) {
+            this.grid_[rightRoomMapY][x] = '#';
+        }
+
+        // Vertical connector
+        if(leftRoomMapY <= rightRoomMapY) {
+            for(let y = leftRoomMapY; y <= rightRoomMapY; y++) {
+                this.grid_[y][halfWay] = '#';
+            }
+        } else {
+            for(let y = rightRoomMapY; y <= leftRoomMapY; y++) {
+                this.grid_[y][halfWay] = '#';
+            }
+        }
+    }
+
+    const verticalPairs = [
+        [0, 3],
+        [3, 6],
+        [2, 5],
+        [5, 8] 
+    ];
+
+    for(const [topIndex, bottomIndex] of verticalPairs) {
+        const topRoom = rooms[topIndex];
+        const bottomRoom = rooms[bottomIndex];
+
+        const topRoomRandomX = Math.floor(Math.random() * (topRoom.width - 2)) + 1;
+        const bottomRoomRandomX = Math.floor(Math.random() * (bottomRoom.width - 2)) + 1;
+
+        const topRoomY = topRoom.height;
+        const bottomRoomY = 0;
+        
+        const topRoomMapX = topRoomRandomX + topRoom.mapX;
+        const bottomRoomMapX = bottomRoomRandomX + bottomRoom.mapX;
+
+        const topRoomMapY = topRoomY + topRoom.mapY;
+        const bottomRoomMapY = bottomRoomY + bottomRoom.mapY;
+
+        const halfWay = Math.floor((topRoomMapY + bottomRoomMapY) / 2);
+        
+        // Vertical line from top room down
+        for(let y = topRoomMapY; y < halfWay; y++) {
+            this.grid_[y][topRoomMapX] = '#';
+        }
+
+        // Vertical line from bottom room up
+        for(let y = bottomRoomMapY; y > halfWay; y--) {
+            this.grid_[y][bottomRoomMapX] = '#';
+        }
+
+        // Horizontal connector
+        if(topRoomMapX <= bottomRoomMapX) {
+            for(let x = topRoomMapX; x <= bottomRoomMapX; x++) {
+                this.grid_[halfWay][x] = '#';
+            }
+        } else {
+            for(let x = bottomRoomMapX; x <= topRoomMapX; x++) {
+                this.grid_[halfWay][x] = '#';
+            }
+        }
+    }
     }
 
     generateRooms() {
