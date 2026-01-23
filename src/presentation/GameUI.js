@@ -107,6 +107,7 @@ export class GameUI {
         this.mapBox_.setContent(mapContent);
         this.screen.program.hideCursor();
         this.screen.render();
+
     }
 
     renderMessage() {
