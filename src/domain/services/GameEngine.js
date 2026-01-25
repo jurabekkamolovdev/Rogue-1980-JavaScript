@@ -237,6 +237,10 @@ export class GameEngine {
                 
             }
 
+            for(let i = 0; i < targetCell.corridor.length; i++) {
+                this.map.grid[targetCell.corridor[i].mapY][targetCell.corridor[i].mapX] = "*";
+            }
+
             this.playRoom_.isVisible = true;
             this.playRoom_.grid[player.y][player.x] = player;
             

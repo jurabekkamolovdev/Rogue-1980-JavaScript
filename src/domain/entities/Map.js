@@ -72,13 +72,13 @@ export class Map {
             newCorridor.leftRoom = {
                 room: leftRoom,
                 mapY: leftRoomRandomY,
-                mapX: leftRoomX,
+                mapX: leftRoomX - 1,
             }
 
             newCorridor.rightRoom = {
                 room: rightRoom,
                 mapY: rightRoomRandomY,
-                mapX: rightRoomX,
+                mapX: rightRoomX + 1,
             }
             
             const leftRoomMapY = leftRoomRandomY + leftRoom.mapY;
@@ -166,13 +166,13 @@ export class Map {
 
             newCorridor.leftRoom = {
                 room: topRoom,
-                mapY: topRoomY,
+                mapY: topRoomY - 1,
                 mapX: topRoomRandomX,
             }
 
             newCorridor.rightRoom = {
                 room: bottomRoom,
-                mapY: bottomRoomY,
+                mapY: bottomRoomY + 1,
                 mapX: bottomRoomRandomX,
             }
             
@@ -289,7 +289,7 @@ export class Map {
                         this.grid_[mapY][mapX] = room.grid[ry][rx].char;
                     } else if(room.grid[ry][rx] instanceof Weapon) {
                         this.grid_[mapY][mapX] = ')';
-                    } else if(room.grid[ry][rx] instanceof Player) {``
+                    } else if(room.grid[ry][rx] instanceof Player) {
                         this.grid_[mapY][mapX] = '@';
                     } else if(room.grid[ry][rx] instanceof Corridor) {
                         this.grid_[mapY][mapX] = '+';
