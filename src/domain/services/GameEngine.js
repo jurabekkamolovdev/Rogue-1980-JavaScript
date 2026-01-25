@@ -224,10 +224,25 @@ export class GameEngine {
                 this.ui_.messages_.push(`You defeated the ${targetCell.type}`);
             }
         } else if(targetCell instanceof Corridor) {
-            const corridor = targetCell.corridor;
-            for(let i = 0; i < corridor.length; i++) {
-                this.map.grid[corridor[i].mapY][corridor[i].mapX] = '#';
+            this.playRoom_.grid[player.y][player.x] = 0;
+            if(targetCell.leftRoom.room !== this.playRoom_) {
+                this.playRoom_ = targetCell.leftRoom.room;
+
+                player.x = targetCell.leftRoom.mapX;
+                player.y = targetCell.leftRoom.mapY;
+            } else {
+                this.playRoom_ = targetCell.rightRoom.room;
+                player.x = targetCell.rightRoom.mapX;
+                player.y = targetCell.rightRoom.mapY;
+                
             }
+
+            this.playRoom_.isVisible = true;
+            this.playRoom_.grid[player.y][player.x] = player;
+            
+
+
+            
         }
         this.moveEnemies();
         this.map_.drawRooms();

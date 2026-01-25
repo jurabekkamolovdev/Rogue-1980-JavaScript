@@ -271,9 +271,9 @@ export class Map {
     }
 
     drawRooms() {
-        const rooms = this.rooms_;
+        // const rooms = this.rooms_;
         // console.log(rooms1);
-        // const rooms = this.rooms_.filter(room => room.isVisible === true);
+        const rooms = this.rooms_.filter(room => room.isVisible === true);
         for(let i = 0; i < rooms.length; i++) {
             const room = rooms[i];
             room.refreshRoom();
