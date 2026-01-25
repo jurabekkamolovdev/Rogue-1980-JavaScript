@@ -6,6 +6,7 @@ import { ENEMY_TYPES, Enemy } from "../entities/Enemy.js"
 import { Map } from "../entities/Map.js"
 import { Player } from "../entities/Player.js"
 import { GameUI } from "../../presentation/GameUI.js"
+import { Corridor } from "../entities/Corridor.js"
 export class GameEngine {
     constructor() {
         this.player_ = null;
@@ -214,15 +215,18 @@ export class GameEngine {
 
         if(targetCell === 0) {
             player.move(dx, dy); 
-        } else {
-            if(targetCell instanceof Enemy) {
-                const damage = player.attack();
-                const isEnemyAlive = targetCell.takeDamage(damage);
-                this.ui_.messages_.push(`You hit the ${targetCell.type} damage ${damage}`);
-                if(!isEnemyAlive) {
-                    room.grid[newY][newX] = 0;
-                    this.ui_.messages_.push(`You defeated the ${targetCell.type}`);
-                }
+        } else if(targetCell instanceof Enemy) {
+            const damage = player.attack();
+            const isEnemyAlive = targetCell.takeDamage(damage);
+            this.ui_.messages_.push(`You hit the ${targetCell.type} damage ${damage}`);
+            if(!isEnemyAlive) {
+                room.grid[newY][newX] = 0;
+                this.ui_.messages_.push(`You defeated the ${targetCell.type}`);
+            }
+        } else if(targetCell instanceof Corridor) {
+            const corridor = targetCell.corridor;
+            for(let i = 0; i < corridor.length; i++) {
+                this.map.grid[corridor[i].mapY][corridor[i].mapX] = '#';
             }
         }
         this.moveEnemies();
