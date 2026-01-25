@@ -17,33 +17,8 @@ const MAP_HEIGHT = ROOMS_IN_HEIGHT * REGION_HEIGHT;
 import { Room } from "./Room.js"
 import { Weapon } from "../entities/Weapon.js"
 import { Enemy } from "../entities/Enemy.js"
-import { Player } from "../entities/Player.js"  
-
-class Corridor {
-    constructor() {
-        this.leftRoom_ = {
-            room: null,
-            mapY: 0,
-            mapX: 0,
-        };
-
-        this.rightRoom_ = {
-            room: null,
-            mapY: 0,
-            mapX: 0,
-        };
-
-        this.corridor_ = [];
-    }
-
-    get corridor() { return this.corridor_; }
-
-    get leftRoom() { return this.leftRoom_; }
-    get rightRoom() { return this.rightRoom_; }
-
-    set leftRoom(value) { this.leftRoom_ = value; }
-    set rightRoom(value) { this.rightRoom_ = value; }
-}
+import { Player } from "../entities/Player.js" 
+import { Corridor } from "./Corridor.js"; 
 
 
 
@@ -164,6 +139,9 @@ export class Map {
             }
 
             this.corridors_.push(newCorridor);
+
+            leftRoom.grid[leftRoomRandomY][leftRoomX] = newCorridor;
+            rightRoom.grid[rightRoomRandomY][rightRoomX] = newCorridor;
         }
 
         
@@ -185,6 +163,18 @@ export class Map {
 
             const topRoomY = topRoom.height - 1;
             const bottomRoomY = 0;
+
+            newCorridor.leftRoom = {
+                room: topRoom,
+                mapY: topRoomY,
+                mapX: topRoomRandomX,
+            }
+
+            newCorridor.rightRoom = {
+                room: bottomRoom,
+                mapY: bottomRoomY,
+                mapX: bottomRoomRandomX,
+            }
             
             const topRoomMapX = topRoomRandomX + topRoom.mapX;
             const bottomRoomMapX = bottomRoomRandomX + bottomRoom.mapX;
@@ -203,17 +193,6 @@ export class Map {
                     }
                 )
                 // this.grid_[y][topRoomMapX] = '#';
-            }
-
-            // Vertical line from bottom room up
-            for(let y = bottomRoomMapY; y > halfWay; y--) {
-                newCorridor.corridor.push(
-                    {
-                        mapY: y,
-                        mapX: bottomRoomMapX
-                    }
-                )
-                // this.grid_[y][bottomRoomMapX] = '#';
             }
 
             // Horizontal connector
@@ -238,7 +217,24 @@ export class Map {
                     // this.grid_[halfWay][x] = '#';
                 }
             }
+
+            // Vertical line from bottom room up
+            for(let y = bottomRoomMapY; y > halfWay; y--) {
+                newCorridor.corridor.push(
+                    {
+                        mapY: y,
+                        mapX: bottomRoomMapX
+                    }
+                )
+                // this.grid_[y][bottomRoomMapX] = '#';
+            }
+
+            
+
             this.corridors_.push(newCorridor);
+
+            topRoom.grid[topRoomY][topRoomRandomX] = newCorridor;
+            bottomRoom.grid[bottomRoomY][bottomRoomRandomX] = newCorridor;
         }
     }
 
@@ -288,13 +284,15 @@ export class Map {
                     const mapX = room.mapX + rx;
                     
                     if(room.grid[ry][rx] === 1) {
-                        this.grid_[mapY][mapX] = `${i + 1}`;
+                        this.grid_[mapY][mapX] = '#';
                     } else if(room.grid[ry][rx] instanceof Enemy) {
                         this.grid_[mapY][mapX] = room.grid[ry][rx].char;
                     } else if(room.grid[ry][rx] instanceof Weapon) {
                         this.grid_[mapY][mapX] = ')';
-                    } else if(room.grid[ry][rx] instanceof Player) {
+                    } else if(room.grid[ry][rx] instanceof Player) {``
                         this.grid_[mapY][mapX] = '@';
+                    } else if(room.grid[ry][rx] instanceof Corridor) {
+                        this.grid_[mapY][mapX] = '+';
                     } else {
                         this.grid_[mapY][mapX] = ' ';
                     }
@@ -302,7 +300,7 @@ export class Map {
             }
         }
 
-        this.drawCorridor();
+        // this.drawCorridor();
     }
 
     drawCorridor() {

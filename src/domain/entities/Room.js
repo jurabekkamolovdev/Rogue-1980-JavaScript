@@ -2,6 +2,7 @@
 import { Enemy } from "./Enemy.js"
 import { Weapon } from "./Weapon.js"
 import { Player } from "./Player.js"
+import { Corridor } from "./Corridor.js";
 export class Room {
     constructor(width, height) {
         this.width_ = width;
@@ -44,7 +45,7 @@ export class Room {
     refreshRoom() {
         for(let i = 0; i < this.height_; i++) {
             for(let j = 0; j < this.width_; j++) {
-                if( (this.grid_[i][j] !== 0) && (this.grid_[i][j] !== 1) ) {
+                if( (this.grid_[i][j] !== 0) && (this.grid_[i][j] !== 1) && (!(this.grid_[i][j] instanceof Corridor))) {
                     const entity = this.grid_[i][j];
                     if( (i !== entity.y) || (j !== entity.x) ) {
                         this.grid_[i][j] = 0;
