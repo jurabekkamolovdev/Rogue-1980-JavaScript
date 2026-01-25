@@ -96,6 +96,9 @@ export class GameUI {
 
     renderMap(map) {
         let mapContent = '';
+
+        
+
         for(let i = 0; i < map.length; i++) {
             let line = '';
             const array = map[i];

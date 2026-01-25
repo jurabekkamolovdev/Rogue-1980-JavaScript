@@ -5,7 +5,7 @@ const ROOMS_IN_WIDTH = 3;
 const ROOMS_IN_HEIGHT = 3;
 const ROOMS_NUM = ROOMS_IN_HEIGHT * ROOMS_IN_WIDTH;
 const REGION_WIDTH = 69;
-const REGION_HEIGHT = 15;
+const REGION_HEIGHT = 14;
 const MIN_ROOM_WIDTH = 6;
 const MAX_ROOM_WIDTH = REGION_WIDTH - 2;
 const MIN_ROOM_HEIGHT = 5;
@@ -18,6 +18,34 @@ import { Room } from "./Room.js"
 import { Weapon } from "../entities/Weapon.js"
 import { Enemy } from "../entities/Enemy.js"
 import { Player } from "../entities/Player.js"  
+
+class Corridor {
+    constructor() {
+        this.leftRoom_ = {
+            room: null,
+            mapY: 0,
+            mapX: 0,
+        };
+
+        this.rightRoom_ = {
+            room: null,
+            mapY: 0,
+            mapX: 0,
+        };
+
+        this.corridor_ = [];
+    }
+
+    get corridor() { return this.corridor_; }
+
+    get leftRoom() { return this.leftRoom_; }
+    get rightRoom() { return this.rightRoom_; }
+
+    set leftRoom(value) { this.leftRoom_ = value; }
+    set rightRoom(value) { this.rightRoom_ = value; }
+}
+
+
 
 export class Map {
     constructor() {
@@ -39,7 +67,7 @@ export class Map {
     get rooms() { return this.rooms_; }
 
     get grid() { return this.grid_; }
-
+    get corridors() { return this.corridors_; }
 
     generateCorridor() {
         const rooms = this.rooms_;
@@ -54,44 +82,91 @@ export class Map {
         ];
 
         for(const [leftIndex, rightIndex] of horizontalPairs) {
+            const newCorridor = new Corridor();
             const leftRoom = rooms[leftIndex];
             const rightRoom = rooms[rightIndex];
+
+
 
             const leftRoomRandomY = Math.floor(Math.random() * (leftRoom.height - 2)) + 1;
             const rightRoomRandomY = Math.floor(Math.random() * (rightRoom.height - 2)) + 1;
 
-            const leftRoomX = leftRoom.width;
+            const leftRoomX = leftRoom.width - 1;
             const rightRoomX = 0;
+
+            newCorridor.leftRoom = {
+                room: leftRoom,
+                mapY: leftRoomRandomY,
+                mapX: leftRoomX,
+            }
+
+            newCorridor.rightRoom = {
+                room: rightRoom,
+                mapY: rightRoomRandomY,
+                mapX: rightRoomX,
+            }
             
             const leftRoomMapY = leftRoomRandomY + leftRoom.mapY;
             const rightRoomMapY = rightRoomRandomY + rightRoom.mapY;
 
-            const leftRoomMapX = leftRoomX + leftRoom.mapX;
-            const rightRoomMapX = rightRoomX + rightRoom.mapX;
+            const leftRoomMapX = leftRoomX + leftRoom.mapX + 1;
+            const rightRoomMapX = rightRoomX + rightRoom.mapX - 1;
 
             const halfWay = Math.floor((leftRoomMapX + rightRoomMapX) / 2);
             
             // Horizontal line from left room
             for(let x = leftRoomMapX; x < halfWay; x++) {
-                this.grid_[leftRoomMapY][x] = '#';
+                newCorridor.corridor.push(
+                    {
+                        mapY: leftRoomMapY,
+                        mapX: x
+                    }
+                )
+
+                // this.grid_[leftRoomMapY][x] = '#';
+
             }
 
             // Horizontal line from right room
-            for(let x = rightRoomMapX; x > halfWay; x--) {
-                this.grid_[rightRoomMapY][x] = '#';
-            }
+
 
             // Vertical connector
             if(leftRoomMapY <= rightRoomMapY) {
                 for(let y = leftRoomMapY; y <= rightRoomMapY; y++) {
-                    this.grid_[y][halfWay] = '#';
+                    // this.grid_[y][halfWay] = '#';
+                    newCorridor.corridor.push(
+                        {
+                            mapY: y,
+                            mapX: halfWay
+                        }
+                    )
                 }
             } else {
                 for(let y = rightRoomMapY; y <= leftRoomMapY; y++) {
-                    this.grid_[y][halfWay] = '#';
+                    // this.grid_[y][halfWay] = '#';
+                    newCorridor.corridor.push(
+                        {
+                            mapY: y,
+                            mapX: halfWay
+                        }
+                    )
                 }
             }
+
+            for(let x = rightRoomMapX; x > halfWay; x--) {
+                newCorridor.corridor.push(
+                    {
+                        mapY: rightRoomMapY,
+                        mapX: x
+                    }
+                )
+                // this.grid_[rightRoomMapY][x] = '#';
+            }
+
+            this.corridors_.push(newCorridor);
         }
+
+        
 
         const verticalPairs = [
             [0, 3],
@@ -101,43 +176,69 @@ export class Map {
         ];
 
         for(const [topIndex, bottomIndex] of verticalPairs) {
+            const newCorridor = new Corridor();
             const topRoom = rooms[topIndex];
             const bottomRoom = rooms[bottomIndex];
 
             const topRoomRandomX = Math.floor(Math.random() * (topRoom.width - 2)) + 1;
             const bottomRoomRandomX = Math.floor(Math.random() * (bottomRoom.width - 2)) + 1;
 
-            const topRoomY = topRoom.height;
+            const topRoomY = topRoom.height - 1;
             const bottomRoomY = 0;
             
             const topRoomMapX = topRoomRandomX + topRoom.mapX;
             const bottomRoomMapX = bottomRoomRandomX + bottomRoom.mapX;
 
-            const topRoomMapY = topRoomY + topRoom.mapY;
-            const bottomRoomMapY = bottomRoomY + bottomRoom.mapY;
+            const topRoomMapY = topRoomY + topRoom.mapY + 1;
+            const bottomRoomMapY = bottomRoomY + bottomRoom.mapY - 1;
 
             const halfWay = Math.floor((topRoomMapY + bottomRoomMapY) / 2);
             
             // Vertical line from top room down
             for(let y = topRoomMapY; y < halfWay; y++) {
-                this.grid_[y][topRoomMapX] = '#';
+                newCorridor.corridor.push(
+                    {
+                        mapY: y,
+                        mapX: topRoomMapX
+                    }
+                )
+                // this.grid_[y][topRoomMapX] = '#';
             }
 
             // Vertical line from bottom room up
             for(let y = bottomRoomMapY; y > halfWay; y--) {
-                this.grid_[y][bottomRoomMapX] = '#';
+                newCorridor.corridor.push(
+                    {
+                        mapY: y,
+                        mapX: bottomRoomMapX
+                    }
+                )
+                // this.grid_[y][bottomRoomMapX] = '#';
             }
 
             // Horizontal connector
             if(topRoomMapX <= bottomRoomMapX) {
                 for(let x = topRoomMapX; x <= bottomRoomMapX; x++) {
-                    this.grid_[halfWay][x] = '#';
+                    newCorridor.corridor.push(
+                        {
+                            mapY: halfWay,
+                            mapX: x
+                        }
+                    )
+                    // this.grid_[halfWay][x] = '#';
                 }
             } else {
                 for(let x = bottomRoomMapX; x <= topRoomMapX; x++) {
-                    this.grid_[halfWay][x] = '#';
+                    newCorridor.corridor.push(
+                        {
+                            mapY: halfWay,
+                            mapX: x
+                        }
+                    )
+                    // this.grid_[halfWay][x] = '#';
                 }
             }
+            this.corridors_.push(newCorridor);
         }
     }
 
@@ -198,6 +299,18 @@ export class Map {
                         this.grid_[mapY][mapX] = ' ';
                     }
                 }
+            }
+        }
+
+        this.drawCorridor();
+    }
+
+    drawCorridor() {
+        const corridors = this.corridors_;
+        for(let i = 0; i < corridors.length; i++) {
+            const corridor = corridors[i].corridor;
+            for(let j = 0; j < corridor.length; j++) {
+                this.grid_[corridor[j].mapY][corridor[j].mapX] = '#';
             }
         }
     }
