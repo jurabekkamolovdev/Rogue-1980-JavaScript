@@ -15,6 +15,8 @@ export class Corridor {
             room: null,        // Room ob'ekti
             roomX: 0,          // Room ichidagi X koordinata
             roomY: 0,          // Room ichidagi Y koordinata
+            playerRoomX: 0,
+            playerRoomY: 0,
             mapX: 0,           // Umumiy map'dagi X koordinata
             mapY: 0            // Umumiy map'dagi Y koordinata
         };
@@ -24,6 +26,8 @@ export class Corridor {
             room: null,
             roomX: 0,
             roomY: 0,
+            playerRoomX: 0,
+            playerRoomY: 0,
             mapX: 0,
             mapY: 0
         };

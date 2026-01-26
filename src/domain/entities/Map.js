@@ -293,6 +293,8 @@ export class Map {
             room: leftRoom,
             roomX: leftRoom.width - 1,
             roomY: leftY,
+            playerRoomX: leftRoom.width - 2,
+            playerRoomY: leftY,
             mapX: leftRoom.mapX + leftRoom.width - 1,
             mapY: leftRoom.mapY + leftY
         };
@@ -302,6 +304,8 @@ export class Map {
             room: rightRoom,
             roomX: 0,
             roomY: rightY,
+            playerRoomX: 1,
+            playerRoomY: rightY,
             mapX: rightRoom.mapX,
             mapY: rightRoom.mapY + rightY
         };
@@ -316,26 +320,25 @@ export class Map {
         const midX = Math.floor((leftMapX + rightMapX) / 2);
 
         // 1. Chapdan o'rtaga (gorizontal)
-// 1. Chapdan o'rtaga (gorizontal)
-for (let x = leftMapX + 1; x <= midX; x++) {
-    corridor.addPathPoint(x, leftMapY);
-}
+        for (let x = leftMapX + 1; x <= midX; x++) {
+            corridor.addPathPoint(x, leftMapY);
+        }
 
-// 2. O'rtadan pastga/tepaga (vertikal)
-if (leftMapY < rightMapY) {
-    for (let y = leftMapY + 1; y <= rightMapY; y++) {
-        corridor.addPathPoint(midX, y);
-    }
-} else if (leftMapY > rightMapY) {
-    for (let y = leftMapY - 1; y >= rightMapY; y--) {
-        corridor.addPathPoint(midX, y);
-    }
-}
+        // 2. O'rtadan pastga/tepaga (vertikal)
+        if (leftMapY < rightMapY) {
+            for (let y = leftMapY + 1; y <= rightMapY; y++) {
+                corridor.addPathPoint(midX, y);
+            }
+        } else if (leftMapY > rightMapY) {
+            for (let y = leftMapY - 1; y >= rightMapY; y--) {
+                corridor.addPathPoint(midX, y);
+            }
+        }
 
-// 3. O'rtadan o'ngga (gorizontal)
-for (let x = midX + 1; x < rightMapX; x++) {
-    corridor.addPathPoint(x, rightMapY);
-}
+        // 3. O'rtadan o'ngga (gorizontal)
+        for (let x = midX + 1; x < rightMapX; x++) {
+            corridor.addPathPoint(x, rightMapY);
+        }
 
 
         // Corridorni xonalarga qo'shish
@@ -360,6 +363,8 @@ for (let x = midX + 1; x < rightMapX; x++) {
             room: topRoom,
             roomX: topX,
             roomY: topRoom.height - 1,
+            playerRoomX: topX,
+            playerRoomY: topRoom.height - 2,
             mapX: topRoom.mapX + topX,
             mapY: topRoom.mapY + topRoom.height - 1
         };
@@ -369,6 +374,8 @@ for (let x = midX + 1; x < rightMapX; x++) {
             room: bottomRoom,
             roomX: bottomX,
             roomY: 0,
+            playerRoomX: bottomX,
+            playerRoomY: 1,
             mapX: bottomRoom.mapX + bottomX,
             mapY: bottomRoom.mapY
         };
@@ -382,28 +389,26 @@ for (let x = midX + 1; x < rightMapX; x++) {
         // Yo'lni qurish: yuqori -> o'rtada -> pastki
         const midY = Math.floor((topMapY + bottomMapY) / 2);
 
-        // 1. Yuqoridan o'rtaga (vertikal)
-// 1. Yuqoridan o'rtaga
-for (let y = topMapY + 1; y <= midY; y++) {
-    corridor.addPathPoint(topMapX, y);
-}
+        // 1. Yuqoridan o'rtaga
+        for (let y = topMapY + 1; y <= midY; y++) {
+            corridor.addPathPoint(topMapX, y);
+        }
 
-// 2. O'rtada gorizontal
-if (topMapX < bottomMapX) {
-    for (let x = topMapX + 1; x <= bottomMapX; x++) {
-        corridor.addPathPoint(x, midY);
-    }
-} else if (topMapX > bottomMapX) {
-    for (let x = topMapX - 1; x >= bottomMapX; x--) {
-        corridor.addPathPoint(x, midY);
-    }
-}
+        // 2. O'rtada gorizontal
+        if (topMapX < bottomMapX) {
+            for (let x = topMapX + 1; x <= bottomMapX; x++) {
+                corridor.addPathPoint(x, midY);
+            }
+        } else if (topMapX > bottomMapX) {
+            for (let x = topMapX - 1; x >= bottomMapX; x--) {
+                corridor.addPathPoint(x, midY);
+            }
+        }
 
-// 3. O'rtadan pastga
-for (let y = midY + 1; y < bottomMapY; y++) {
-    corridor.addPathPoint(bottomMapX, y);
-}
-
+        // 3. O'rtadan pastga
+        for (let y = midY + 1; y < bottomMapY; y++) {
+            corridor.addPathPoint(bottomMapX, y);
+        }
 
         // Corridorni xonalarga qo'shish
         topRoom.grid[topRoom.height - 1][topX] = corridor;

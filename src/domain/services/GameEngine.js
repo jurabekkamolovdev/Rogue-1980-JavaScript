@@ -470,8 +470,8 @@ export class GameEngine {
         
         // Yangi xonaga o'tish
         this.playRoom_ = entry.room;
-        player.x = entry.roomX;
-        player.y = entry.roomY;
+        player.x = entry.playerRoomX;
+        player.y = entry.playerRoomY;
         player.inCorridor = null;
         
         // Xonani ko'rinadigan qilish
