@@ -316,25 +316,27 @@ export class Map {
         const midX = Math.floor((leftMapX + rightMapX) / 2);
 
         // 1. Chapdan o'rtaga (gorizontal)
-        for (let x = leftMapX + 1; x <= midX; x++) {
-            corridor.addPathPoint(x, leftMapY);
-        }
+// 1. Chapdan o'rtaga (gorizontal)
+for (let x = leftMapX + 1; x <= midX; x++) {
+    corridor.addPathPoint(x, leftMapY);
+}
 
-        // 2. O'rtada vertikal birlashtirish
-        const minY = Math.min(leftMapY, rightMapY);
-        const maxY = Math.max(leftMapY, rightMapY);
-        for (let y = minY; y <= maxY; y++) {
-            if (y !== leftMapY) { // Takrorlanishni oldini olish
-                corridor.addPathPoint(midX, y);
-            }
-        }
+// 2. O'rtadan pastga/tepaga (vertikal)
+if (leftMapY < rightMapY) {
+    for (let y = leftMapY + 1; y <= rightMapY; y++) {
+        corridor.addPathPoint(midX, y);
+    }
+} else if (leftMapY > rightMapY) {
+    for (let y = leftMapY - 1; y >= rightMapY; y--) {
+        corridor.addPathPoint(midX, y);
+    }
+}
 
-        // 3. O'rtadan o'ngga (gorizontal)
-        for (let x = midX; x < rightMapX; x++) {
-            if (x !== midX) { // Takrorlanishni oldini olish
-                corridor.addPathPoint(x, rightMapY);
-            }
-        }
+// 3. O'rtadan o'ngga (gorizontal)
+for (let x = midX + 1; x < rightMapX; x++) {
+    corridor.addPathPoint(x, rightMapY);
+}
+
 
         // Corridorni xonalarga qo'shish
         leftRoom.grid[leftY][leftRoom.width - 1] = corridor;
@@ -381,25 +383,27 @@ export class Map {
         const midY = Math.floor((topMapY + bottomMapY) / 2);
 
         // 1. Yuqoridan o'rtaga (vertikal)
-        for (let y = topMapY + 1; y <= midY; y++) {
-            corridor.addPathPoint(topMapX, y);
-        }
+// 1. Yuqoridan o'rtaga
+for (let y = topMapY + 1; y <= midY; y++) {
+    corridor.addPathPoint(topMapX, y);
+}
 
-        // 2. O'rtada gorizontal birlashtirish
-        const minX = Math.min(topMapX, bottomMapX);
-        const maxX = Math.max(topMapX, bottomMapX);
-        for (let x = minX; x <= maxX; x++) {
-            if (x !== topMapX) {
-                corridor.addPathPoint(x, midY);
-            }
-        }
+// 2. O'rtada gorizontal
+if (topMapX < bottomMapX) {
+    for (let x = topMapX + 1; x <= bottomMapX; x++) {
+        corridor.addPathPoint(x, midY);
+    }
+} else if (topMapX > bottomMapX) {
+    for (let x = topMapX - 1; x >= bottomMapX; x--) {
+        corridor.addPathPoint(x, midY);
+    }
+}
 
-        // 3. O'rtadan pastga (vertikal)
-        for (let y = midY; y < bottomMapY; y++) {
-            if (y !== midY) {
-                corridor.addPathPoint(bottomMapX, y);
-            }
-        }
+// 3. O'rtadan pastga
+for (let y = midY + 1; y < bottomMapY; y++) {
+    corridor.addPathPoint(bottomMapX, y);
+}
+
 
         // Corridorni xonalarga qo'shish
         topRoom.grid[topRoom.height - 1][topX] = corridor;
@@ -476,7 +480,7 @@ export class Map {
     drawCorridor() {
         const corridors = this.corridors_;
         for(let i = 0; i < corridors.length; i++) {
-            const corridor = corridors[i].corridor;
+            const corridor = corridors[i].path;
             for(let j = 0; j < corridor.length; j++) {
                 this.grid_[corridor[j].mapY][corridor[j].mapX] = '#';
             }
