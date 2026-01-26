@@ -44,198 +44,368 @@ export class Map {
     get grid() { return this.grid_; }
     get corridors() { return this.corridors_; }
 
+    // generateCorridor() {
+    //     const rooms = this.rooms_;
+        
+    //     const horizontalPairs = [
+    //         [0, 1],
+    //         [1, 2],
+    //         [3, 4],
+    //         [4, 5],
+    //         [6, 7],
+    //         [7, 8] 
+    //     ];
+
+    //     for(const [leftIndex, rightIndex] of horizontalPairs) {
+    //         const newCorridor = new Corridor();
+    //         const leftRoom = rooms[leftIndex];
+    //         const rightRoom = rooms[rightIndex];
+
+
+
+    //         const leftRoomRandomY = Math.floor(Math.random() * (leftRoom.height - 2)) + 1;
+    //         const rightRoomRandomY = Math.floor(Math.random() * (rightRoom.height - 2)) + 1;
+
+    //         const leftRoomX = leftRoom.width - 1;
+    //         const rightRoomX = 0;
+
+    //         newCorridor.leftRoom = {
+    //             room: leftRoom,
+    //             mapY: leftRoomRandomY,
+    //             mapX: leftRoomX - 1,
+    //         }
+
+    //         newCorridor.rightRoom = {
+    //             room: rightRoom,
+    //             mapY: rightRoomRandomY,
+    //             mapX: rightRoomX + 1,
+    //         }
+            
+    //         const leftRoomMapY = leftRoomRandomY + leftRoom.mapY;
+    //         const rightRoomMapY = rightRoomRandomY + rightRoom.mapY;
+
+    //         const leftRoomMapX = leftRoomX + leftRoom.mapX + 1;
+    //         const rightRoomMapX = rightRoomX + rightRoom.mapX - 1;
+
+    //         const halfWay = Math.floor((leftRoomMapX + rightRoomMapX) / 2);
+            
+    //         // Horizontal line from left room
+    //         for(let x = leftRoomMapX; x < halfWay; x++) {
+    //             newCorridor.corridor.push(
+    //                 {
+    //                     mapY: leftRoomMapY,
+    //                     mapX: x
+    //                 }
+    //             )
+
+    //             // this.grid_[leftRoomMapY][x] = '#';
+
+    //         }
+
+    //         // Horizontal line from right room
+
+
+    //         // Vertical connector
+    //         if(leftRoomMapY <= rightRoomMapY) {
+    //             for(let y = leftRoomMapY; y <= rightRoomMapY; y++) {
+    //                 // this.grid_[y][halfWay] = '#';
+    //                 newCorridor.corridor.push(
+    //                     {
+    //                         mapY: y,
+    //                         mapX: halfWay
+    //                     }
+    //                 )
+    //             }
+    //         } else {
+    //             for(let y = rightRoomMapY; y <= leftRoomMapY; y++) {
+    //                 // this.grid_[y][halfWay] = '#';
+    //                 newCorridor.corridor.push(
+    //                     {
+    //                         mapY: y,
+    //                         mapX: halfWay
+    //                     }
+    //                 )
+    //             }
+    //         }
+    //         let tempArray = [] 
+    //         for(let x = rightRoomMapX; x > halfWay; x--) {
+    //             tempArray.push(
+    //                 {
+    //                     mapY: rightRoomMapY,
+    //                     mapX: x
+    //                 }
+    //             )
+    //             // this.grid_[rightRoomMapY][x] = '#';
+    //         }
+    //         for(let i = tempArray.length; i >= 0; i--) {
+    //             newCorridor.corridor.push(tempArray[i]);
+    //         }
+
+
+    //         this.corridors_.push(newCorridor);
+
+    //         newCorridor.left = newCorridor.corridor.length - 1;
+    //         leftRoom.grid[leftRoomRandomY][leftRoomX] = newCorridor;
+    //         rightRoom.grid[rightRoomRandomY][rightRoomX] = newCorridor;
+    //     }
+
+        
+
+    //     const verticalPairs = [
+    //         [0, 3],
+    //         [3, 6],
+    //         [2, 5],
+    //         [5, 8] 
+    //     ];
+
+    //     for(const [topIndex, bottomIndex] of verticalPairs) {
+    //         const newCorridor = new Corridor();
+    //         const topRoom = rooms[topIndex];
+    //         const bottomRoom = rooms[bottomIndex];
+
+    //         const topRoomRandomX = Math.floor(Math.random() * (topRoom.width - 2)) + 1;
+    //         const bottomRoomRandomX = Math.floor(Math.random() * (bottomRoom.width - 2)) + 1;
+
+    //         const topRoomY = topRoom.height - 1;
+    //         const bottomRoomY = 0;
+
+    //         newCorridor.leftRoom = {
+    //             room: topRoom,
+    //             mapY: topRoomY - 1,
+    //             mapX: topRoomRandomX,
+    //         }
+
+    //         newCorridor.rightRoom = {
+    //             room: bottomRoom,
+    //             mapY: bottomRoomY + 1,
+    //             mapX: bottomRoomRandomX,
+    //         }
+            
+    //         const topRoomMapX = topRoomRandomX + topRoom.mapX;
+    //         const bottomRoomMapX = bottomRoomRandomX + bottomRoom.mapX;
+
+    //         const topRoomMapY = topRoomY + topRoom.mapY + 1;
+    //         const bottomRoomMapY = bottomRoomY + bottomRoom.mapY - 1;
+
+    //         const halfWay = Math.floor((topRoomMapY + bottomRoomMapY) / 2);
+            
+    //         // Vertical line from top room down
+    //         for(let y = topRoomMapY; y < halfWay; y++) {
+    //             newCorridor.corridor.push(
+    //                 {
+    //                     mapY: y,
+    //                     mapX: topRoomMapX
+    //                 }
+    //             )
+    //             // this.grid_[y][topRoomMapX] = '#';
+    //         }
+
+    //         // Horizontal connector
+    //         if(topRoomMapX <= bottomRoomMapX) {
+    //             for(let x = topRoomMapX; x <= bottomRoomMapX; x++) {
+    //                 newCorridor.corridor.push(
+    //                     {
+    //                         mapY: halfWay,
+    //                         mapX: x
+    //                     }
+    //                 )
+    //                 // this.grid_[halfWay][x] = '#';
+    //             }
+    //         } else {
+    //             for(let x = bottomRoomMapX; x <= topRoomMapX; x++) {
+    //                 newCorridor.corridor.push(
+    //                     {
+    //                         mapY: halfWay,
+    //                         mapX: x
+    //                     }
+    //                 )
+    //                 // this.grid_[halfWay][x] = '#';
+    //             }
+    //         }
+
+    //         // Vertical line from bottom room up
+    //         let tempArray2 = []
+    //         for(let y = bottomRoomMapY; y > halfWay; y--) {
+    //             tempArray2.push(
+    //                 {
+    //                     mapY: y,
+    //                     mapX: bottomRoomMapX
+    //                 }
+    //             )
+    //             // this.grid_[y][bottomRoomMapX] = '#';
+    //         }
+
+
+    //         for(let i = tempArray2.length; i >= 0; i--) {
+    //             newCorridor.corridor.push(tempArray2[i]);
+    //         }
+            
+
+    //         this.corridors_.push(newCorridor);
+    //         newCorridor.left = newCorridor.corridor.length - 1;
+    //         topRoom.grid[topRoomY][topRoomRandomX] = newCorridor;
+    //         bottomRoom.grid[bottomRoomY][bottomRoomRandomX] = newCorridor;
+            
+    //     }
+    // }
+
+    // Map.js - generateCorridor() funksiyasining yangilangan versiyasi
+
+// Map.js - generateCorridor() funksiyasining yangilangan versiyasi
+
     generateCorridor() {
         const rooms = this.rooms_;
         
+        // ===== GORIZONTAL CORRIDORLAR =====
         const horizontalPairs = [
-            [0, 1],
-            [1, 2],
-            [3, 4],
-            [4, 5],
-            [6, 7],
-            [7, 8] 
+            [0, 1], [1, 2],  // 1-qator
+            [3, 4], [4, 5],  // 2-qator
+            [6, 7], [7, 8]   // 3-qator
         ];
 
-        for(const [leftIndex, rightIndex] of horizontalPairs) {
-            const newCorridor = new Corridor();
-            const leftRoom = rooms[leftIndex];
-            const rightRoom = rooms[rightIndex];
-
-
-
-            const leftRoomRandomY = Math.floor(Math.random() * (leftRoom.height - 2)) + 1;
-            const rightRoomRandomY = Math.floor(Math.random() * (rightRoom.height - 2)) + 1;
-
-            const leftRoomX = leftRoom.width - 1;
-            const rightRoomX = 0;
-
-            newCorridor.leftRoom = {
-                room: leftRoom,
-                mapY: leftRoomRandomY,
-                mapX: leftRoomX - 1,
-            }
-
-            newCorridor.rightRoom = {
-                room: rightRoom,
-                mapY: rightRoomRandomY,
-                mapX: rightRoomX + 1,
-            }
-            
-            const leftRoomMapY = leftRoomRandomY + leftRoom.mapY;
-            const rightRoomMapY = rightRoomRandomY + rightRoom.mapY;
-
-            const leftRoomMapX = leftRoomX + leftRoom.mapX + 1;
-            const rightRoomMapX = rightRoomX + rightRoom.mapX - 1;
-
-            const halfWay = Math.floor((leftRoomMapX + rightRoomMapX) / 2);
-            
-            // Horizontal line from left room
-            for(let x = leftRoomMapX; x < halfWay; x++) {
-                newCorridor.corridor.push(
-                    {
-                        mapY: leftRoomMapY,
-                        mapX: x
-                    }
-                )
-
-                // this.grid_[leftRoomMapY][x] = '#';
-
-            }
-
-            // Horizontal line from right room
-
-
-            // Vertical connector
-            if(leftRoomMapY <= rightRoomMapY) {
-                for(let y = leftRoomMapY; y <= rightRoomMapY; y++) {
-                    // this.grid_[y][halfWay] = '#';
-                    newCorridor.corridor.push(
-                        {
-                            mapY: y,
-                            mapX: halfWay
-                        }
-                    )
-                }
-            } else {
-                for(let y = rightRoomMapY; y <= leftRoomMapY; y++) {
-                    // this.grid_[y][halfWay] = '#';
-                    newCorridor.corridor.push(
-                        {
-                            mapY: y,
-                            mapX: halfWay
-                        }
-                    )
-                }
-            }
-
-            for(let x = rightRoomMapX; x > halfWay; x--) {
-                newCorridor.corridor.push(
-                    {
-                        mapY: rightRoomMapY,
-                        mapX: x
-                    }
-                )
-                // this.grid_[rightRoomMapY][x] = '#';
-            }
-
-            this.corridors_.push(newCorridor);
-
-            leftRoom.grid[leftRoomRandomY][leftRoomX] = newCorridor;
-            rightRoom.grid[rightRoomRandomY][rightRoomX] = newCorridor;
+        for (const [leftIdx, rightIdx] of horizontalPairs) {
+            this.createHorizontalCorridor(rooms[leftIdx], rooms[rightIdx]);
         }
 
-        
-
+        // ===== VERTIKAL CORRIDORLAR =====
         const verticalPairs = [
-            [0, 3],
-            [3, 6],
-            [2, 5],
-            [5, 8] 
+            [0, 3], [3, 6],  // 1-ustun
+            [2, 5], [5, 8]   // 3-ustun
         ];
 
-        for(const [topIndex, bottomIndex] of verticalPairs) {
-            const newCorridor = new Corridor();
-            const topRoom = rooms[topIndex];
-            const bottomRoom = rooms[bottomIndex];
-
-            const topRoomRandomX = Math.floor(Math.random() * (topRoom.width - 2)) + 1;
-            const bottomRoomRandomX = Math.floor(Math.random() * (bottomRoom.width - 2)) + 1;
-
-            const topRoomY = topRoom.height - 1;
-            const bottomRoomY = 0;
-
-            newCorridor.leftRoom = {
-                room: topRoom,
-                mapY: topRoomY - 1,
-                mapX: topRoomRandomX,
-            }
-
-            newCorridor.rightRoom = {
-                room: bottomRoom,
-                mapY: bottomRoomY + 1,
-                mapX: bottomRoomRandomX,
-            }
-            
-            const topRoomMapX = topRoomRandomX + topRoom.mapX;
-            const bottomRoomMapX = bottomRoomRandomX + bottomRoom.mapX;
-
-            const topRoomMapY = topRoomY + topRoom.mapY + 1;
-            const bottomRoomMapY = bottomRoomY + bottomRoom.mapY - 1;
-
-            const halfWay = Math.floor((topRoomMapY + bottomRoomMapY) / 2);
-            
-            // Vertical line from top room down
-            for(let y = topRoomMapY; y < halfWay; y++) {
-                newCorridor.corridor.push(
-                    {
-                        mapY: y,
-                        mapX: topRoomMapX
-                    }
-                )
-                // this.grid_[y][topRoomMapX] = '#';
-            }
-
-            // Horizontal connector
-            if(topRoomMapX <= bottomRoomMapX) {
-                for(let x = topRoomMapX; x <= bottomRoomMapX; x++) {
-                    newCorridor.corridor.push(
-                        {
-                            mapY: halfWay,
-                            mapX: x
-                        }
-                    )
-                    // this.grid_[halfWay][x] = '#';
-                }
-            } else {
-                for(let x = bottomRoomMapX; x <= topRoomMapX; x++) {
-                    newCorridor.corridor.push(
-                        {
-                            mapY: halfWay,
-                            mapX: x
-                        }
-                    )
-                    // this.grid_[halfWay][x] = '#';
-                }
-            }
-
-            // Vertical line from bottom room up
-            for(let y = bottomRoomMapY; y > halfWay; y--) {
-                newCorridor.corridor.push(
-                    {
-                        mapY: y,
-                        mapX: bottomRoomMapX
-                    }
-                )
-                // this.grid_[y][bottomRoomMapX] = '#';
-            }
-
-            
-
-            this.corridors_.push(newCorridor);
-
-            topRoom.grid[topRoomY][topRoomRandomX] = newCorridor;
-            bottomRoom.grid[bottomRoomY][bottomRoomRandomX] = newCorridor;
+        for (const [topIdx, bottomIdx] of verticalPairs) {
+            this.createVerticalCorridor(rooms[topIdx], rooms[bottomIdx]);
         }
+    }
+
+    /**
+     * Gorizontal corridor yaratish (chap-o'ng)
+     */
+    createHorizontalCorridor(leftRoom, rightRoom) {
+        const corridor = new Corridor();
+
+        // Tasodifiy Y pozitsiyalarini tanlash
+        const leftY = Math.floor(Math.random() * (leftRoom.height - 2)) + 1;
+        const rightY = Math.floor(Math.random() * (rightRoom.height - 2)) + 1;
+
+        // Entry 1: Chap xonaning o'ng devori
+        corridor.entry1 = {
+            room: leftRoom,
+            roomX: leftRoom.width - 1,
+            roomY: leftY,
+            mapX: leftRoom.mapX + leftRoom.width - 1,
+            mapY: leftRoom.mapY + leftY
+        };
+
+        // Entry 2: O'ng xonaning chap devori
+        corridor.entry2 = {
+            room: rightRoom,
+            roomX: 0,
+            roomY: rightY,
+            mapX: rightRoom.mapX,
+            mapY: rightRoom.mapY + rightY
+        };
+
+        // Map koordinatalari
+        const leftMapX = corridor.entry1.mapX;
+        const leftMapY = corridor.entry1.mapY;
+        const rightMapX = corridor.entry2.mapX;
+        const rightMapY = corridor.entry2.mapY;
+
+        // Yo'lni qurish: chap -> o'rtada -> o'ng
+        const midX = Math.floor((leftMapX + rightMapX) / 2);
+
+        // 1. Chapdan o'rtaga (gorizontal)
+        for (let x = leftMapX + 1; x <= midX; x++) {
+            corridor.addPathPoint(x, leftMapY);
+        }
+
+        // 2. O'rtada vertikal birlashtirish
+        const minY = Math.min(leftMapY, rightMapY);
+        const maxY = Math.max(leftMapY, rightMapY);
+        for (let y = minY; y <= maxY; y++) {
+            if (y !== leftMapY) { // Takrorlanishni oldini olish
+                corridor.addPathPoint(midX, y);
+            }
+        }
+
+        // 3. O'rtadan o'ngga (gorizontal)
+        for (let x = midX; x < rightMapX; x++) {
+            if (x !== midX) { // Takrorlanishni oldini olish
+                corridor.addPathPoint(x, rightMapY);
+            }
+        }
+
+        // Corridorni xonalarga qo'shish
+        leftRoom.grid[leftY][leftRoom.width - 1] = corridor;
+        rightRoom.grid[rightY][0] = corridor;
+        
+        this.corridors_.push(corridor);
+    }
+
+    /**
+     * Vertikal corridor yaratish (yuqori-pastki)
+     */
+    createVerticalCorridor(topRoom, bottomRoom) {
+        const corridor = new Corridor();
+
+        // Tasodifiy X pozitsiyalarini tanlash
+        const topX = Math.floor(Math.random() * (topRoom.width - 2)) + 1;
+        const bottomX = Math.floor(Math.random() * (bottomRoom.width - 2)) + 1;
+
+        // Entry 1: Yuqori xonaning pastki devori
+        corridor.entry1 = {
+            room: topRoom,
+            roomX: topX,
+            roomY: topRoom.height - 1,
+            mapX: topRoom.mapX + topX,
+            mapY: topRoom.mapY + topRoom.height - 1
+        };
+
+        // Entry 2: Pastki xonaning yuqori devori
+        corridor.entry2 = {
+            room: bottomRoom,
+            roomX: bottomX,
+            roomY: 0,
+            mapX: bottomRoom.mapX + bottomX,
+            mapY: bottomRoom.mapY
+        };
+
+        // Map koordinatalari
+        const topMapX = corridor.entry1.mapX;
+        const topMapY = corridor.entry1.mapY;
+        const bottomMapX = corridor.entry2.mapX;
+        const bottomMapY = corridor.entry2.mapY;
+
+        // Yo'lni qurish: yuqori -> o'rtada -> pastki
+        const midY = Math.floor((topMapY + bottomMapY) / 2);
+
+        // 1. Yuqoridan o'rtaga (vertikal)
+        for (let y = topMapY + 1; y <= midY; y++) {
+            corridor.addPathPoint(topMapX, y);
+        }
+
+        // 2. O'rtada gorizontal birlashtirish
+        const minX = Math.min(topMapX, bottomMapX);
+        const maxX = Math.max(topMapX, bottomMapX);
+        for (let x = minX; x <= maxX; x++) {
+            if (x !== topMapX) {
+                corridor.addPathPoint(x, midY);
+            }
+        }
+
+        // 3. O'rtadan pastga (vertikal)
+        for (let y = midY; y < bottomMapY; y++) {
+            if (y !== midY) {
+                corridor.addPathPoint(bottomMapX, y);
+            }
+        }
+
+        // Corridorni xonalarga qo'shish
+        topRoom.grid[topRoom.height - 1][topX] = corridor;
+        bottomRoom.grid[0][bottomX] = corridor;
+        
+        this.corridors_.push(corridor);
     }
 
     generateRooms() {

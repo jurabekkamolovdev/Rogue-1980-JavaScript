@@ -29,6 +29,7 @@ export class Player {
         this.gold_ = 0;
 
         this.level_ = 1;
+        this.inCorridor_ = null;
     }
 
     get x() { return this.x_; }
@@ -37,6 +38,8 @@ export class Player {
     get y() { return this.y_; } 
     set y(value) { this.y_ = value; }
 
+    get inCorridor() { return this.inCorridor_; }
+    set inCorridor(value) { this.inCorridor_ = value; } 
 
     get health() { return this.currentHealth_; }
     set health(hp) {
