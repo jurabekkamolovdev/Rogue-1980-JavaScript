@@ -204,104 +204,19 @@ export class GameEngine {
         this.ui_.renderStats(player);
     }
 
-    // move(dx, dy) {
-    //     const player = this.player_;
-    //     const room = this.playRoom_;
-
-    //     const newX = player.x + dx;
-    //     const newY = player.y + dy;
-    //     let targetCell;
-    //     if(player.inCorridor === null) {
-    //         targetCell = room.grid[newY][newX];
-    //     }
-
-    //     if(targetCell instanceof Corridor) {
-    //         player.inCorridor = targetCell;
-    //         this.playRoom_.grid[player.y][player.x] = 0;
-    //         if(player.inCorridor.leftRoom.room !== this.playRoom_) {
-    //             player.x = player.inCorridor.corridor[player.inCorridor.left].mapX;
-    //             player.y = player.inCorridor.corridor[player.inCorridor.left].mapY;
-    //             if(newX === 0) {
-    //                 this.map_.grid[player.inCorridor.corridor[player.inCorridor.left].mapY][player.inCorridor.corridor[player.inCorridor.left].mapX - 1] = '#'
-    //             } else if(newY === 0) {
-    //                 this.map_.grid[player.inCorridor.corridor[player.inCorridor.left].mapY - 1][player.inCorridor.corridor[player.inCorridor.left].mapX] = '#' 
-    //             }
-                
-    //         } else {
-    //             player.x = player.inCorridor.corridor[player.inCorridor.right].mapX;
-    //             player.y = player.inCorridor.corridor[player.inCorridor.right].mapY;
-
-    //             if(newX === room.width - 1) {
-    //                 this.map_.grid[player.inCorridor.corridor[player.inCorridor.right].mapY][player.inCorridor.corridor[player.inCorridor.right].mapX + 1] = '#'
-    //             } else if(newY === room.height - 1) {
-    //                 this.map_.grid[player.inCorridor.corridor[player.inCorridor.right].mapY + 1][player.inCorridor.corridor[player.inCorridor.right].mapX] = '#' 
-    //             }
-    //         }
-
-    //         this.map_.grid[player.y][player.x] = '@';
-    //                 this.moveEnemies();
-    //     this.map_.drawRooms();
-    //     this.ui_.renderMessage();
-    //     this.ui_.renderMap(this.map_.grid);
-    //     this.ui_.renderStats(player);
-    //     return;
-    //     }
-
-    //     if(targetCell === 0) {
-    //         player.move(dx, dy); 
-    //     } else if(targetCell instanceof Enemy) {
-    //         const damage = player.attack();
-    //         const isEnemyAlive = targetCell.takeDamage(damage);
-    //         this.ui_.messages_.push(`You hit the ${targetCell.type} damage ${damage}`);
-    //         if(!isEnemyAlive) {
-    //             room.grid[newY][newX] = 0;
-    //             this.ui_.messages_.push(`You defeated the ${targetCell.type}`);
-    //         }
-    //     } else if(player.inCorridor) {
-    //         if(player.inCorridor.leftRoom.room !== this.playRoom_) {
-
-    //             this.playRoom_ = player.inCorridor.leftRoom.room;
-
-    //             player.x = player.inCorridor.leftRoom.mapX;
-    //             player.y = player.inCorridor.leftRoom.mapY;
-    //         } else {
-    //             this.playRoom_ = player.inCorridor.rightRoom.room;
-    //             player.x = player.inCorridor.rightRoom.mapX;
-    //             player.y = player.inCorridor.rightRoom.mapY;
-                
-    //         }
-
-    //         for(let i = 0; i < player.inCorridor.corridor.length; i++) {
-    //             this.map.grid[player.inCorridor.corridor[i].mapY][player.inCorridor.corridor[i].mapX] = "*";
-    //         }
-
-    //         this.playRoom_.isVisible = true;
-    //         this.playRoom_.grid[player.y][player.x] = player;
-    //         player.inCorridor = null;
-    //     }
-    //     this.moveEnemies();
-    //     this.map_.drawRooms();
-    //     this.ui_.renderMessage();
-    //     this.ui_.renderMap(this.map_.grid);
-    //     this.ui_.renderStats(player);
-    // }
-// GameEngine.js - move() funksiyasining yangilangan versiyasi
 
     move(dx, dy) {
         const player = this.player_;
         const newX = player.x + dx;
         const newY = player.y + dy;
 
-        // ===== CASE 1: Player corridorda =====
         if (player.inCorridor !== null) {
             this.handleCorridorMovement(newX, newY);
             return;
         }
 
-        // ===== CASE 2: Player xonada =====
         const room = this.playRoom_;
         
-        // Chegaralarni tekshirish
         if (newY < 0 || newY >= room.height || newX < 0 || newX >= room.width) {
             this.updateGameState();
             return;
@@ -309,19 +224,16 @@ export class GameEngine {
         
         const targetCell = room.grid[newY][newX];
 
-        // 2a: Corridorga kirish
         if (targetCell instanceof Corridor) {
             this.enterCorridor(targetCell);
             return;
         }
 
-        // 2b: Bo'sh joyga harakat
         if (targetCell === 0) {
             room.grid[player.y][player.x] = 0;
             player.move(dx, dy);
             room.grid[player.y][player.x] = player;
         } 
-        // 2c: Dushman bilan jang
         else if (targetCell instanceof Enemy) {
             this.attackEnemy(targetCell, newX, newY);
         }
@@ -329,20 +241,14 @@ export class GameEngine {
         this.updateGameState();
     }
 
-    /**
-     * Corridorga kirish jarayoni
-     */
     enterCorridor(corridor) {
         const player = this.player_;
         const room = this.playRoom_;
 
-        // Player corridorga kirdi
         player.inCorridor = corridor;
         
-        // Xonadan playerni o'chirish
         room.grid[player.y][player.x] = 0;
 
-        // Qaysi tarafdan kirganini aniqlash
         const info = corridor.getEntryExitForRoom(room);
         
         if (!info) {
@@ -350,36 +256,27 @@ export class GameEngine {
             return;
         }
 
-        // Path'ning birinchi nuqtasiga o'tkazish
         const firstPathPoint = corridor.path[0];
         
-        // Entry qaysi tarafda ekanligini tekshirish
         if (info.entryIndex === 0) {
-            // Entry1 tarafidan kirmoqda
             player.x = firstPathPoint.mapX;
             player.y = firstPathPoint.mapY;
         } else {
-            // Entry2 tarafidan kirmoqda (path oxiridan)
             const lastPathPoint = corridor.path[corridor.path.length - 1];
             player.x = lastPathPoint.mapX;
             player.y = lastPathPoint.mapY;
         }
         
-        // Player pozitsiyasini corridorda ko'rsatish
         this.map_.grid[player.y][player.x] = '@';
 
         this.ui_.messages_.push(`You enter the corridor`);
         this.updateGameState();
     }
 
-    /**
-     * Corridor ichida harakat
-     */
     handleCorridorMovement(newX, newY) {
         const player = this.player_;
         const corridor = player.inCorridor;
         
-        // Hozirgi pozitsiya
         const currentIndex = corridor.getPathIndex(player.x, player.y);
         
         if (currentIndex === -1) {
@@ -387,11 +284,9 @@ export class GameEngine {
             return;
         }
 
-        // Keyingi pozitsiyani hisoblash
         const nextIndex = this.calculateNextCorridorIndex(currentIndex, newX, newY, corridor);
         
         if (nextIndex === -1) {
-            // Xonaga qaytish yoki noto'g'ri harakat
             const canExit = this.tryExitCorridor(currentIndex);
             if (!canExit) {
                 this.ui_.messages_.push(`Can't move that way`);
@@ -400,10 +295,8 @@ export class GameEngine {
             return;
         }
 
-        // Eski joyni tiklash (# bilan)
         this.map_.grid[player.y][player.x] = '#';
         
-        // Yangi joyga o'tish
         const nextPoint = corridor.path[nextIndex];
         player.x = nextPoint.mapX;
         player.y = nextPoint.mapY;
@@ -413,11 +306,7 @@ export class GameEngine {
         this.updateGameState();
     }
 
-    /**
-     * Keyingi corridor indeksini hisoblash
-     */
     calculateNextCorridorIndex(currentIndex, targetMapX, targetMapY, corridor) {
-        // Oldinga va orqaga qarab tekshirish
         const nextIndex = currentIndex + 1;
         const prevIndex = currentIndex - 1;
         
@@ -435,23 +324,17 @@ export class GameEngine {
             }
         }
         
-        return -1; // Noto'g'ri harakat
+        return -1;
     }
 
-    /**
-     * Corridordan chiqishga harakat qilish
-     */
     tryExitCorridor(currentIndex) {
         const player = this.player_;
         const corridor = player.inCorridor;
         
-        // Path oxirida yoki boshidami?
         if (currentIndex === 0) {
-            // Entry1 ga chiqish
             this.exitCorridorToRoom(corridor.entry1);
             return true;
         } else if (currentIndex === corridor.path.length - 1) {
-            // Entry2 ga chiqish
             this.exitCorridorToRoom(corridor.entry2);
             return true;
         }
@@ -459,22 +342,16 @@ export class GameEngine {
         return false;
     }
 
-    /**
-     * Corridordan xonaga chiqish
-     */
     exitCorridorToRoom(entry) {
         const player = this.player_;
         
-        // Eski corridorni tiklash
         this.map_.grid[player.y][player.x] = '#';
         
-        // Yangi xonaga o'tish
         this.playRoom_ = entry.room;
         player.x = entry.playerRoomX;
         player.y = entry.playerRoomY;
         player.inCorridor = null;
         
-        // Xonani ko'rinadigan qilish
         this.playRoom_.isVisible = true;
         this.playRoom_.grid[player.y][player.x] = player;
         
@@ -482,9 +359,6 @@ export class GameEngine {
         this.updateGameState();
     }
 
-    /**
-     * Dushmanga hujum
-     */
     attackEnemy(enemy, newX, newY) {
         const player = this.player_;
         const room = this.playRoom_;
@@ -503,9 +377,6 @@ export class GameEngine {
         this.updateGameState();
     }
 
-    /**
-     * O'yin holatini yangilash
-     */
     updateGameState() {
         this.moveEnemies();
         this.map_.drawRooms();
@@ -539,7 +410,6 @@ export class GameEngine {
                         const enemyDamage = enemy.attack();
                         const isPlayerAlive = player.takeDamage(enemyDamage);
                         this.ui_.messages_.push(`The ${enemy.type} hits you!`);
-                        // this.ui_.renderMessage(`The ${enemy.type} hits you!`);
                         if(!isPlayerAlive) {
                             this.ui_.renderMessage('Game Over! You died.');
                         }
