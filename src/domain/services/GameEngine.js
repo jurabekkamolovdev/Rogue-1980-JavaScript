@@ -1,17 +1,19 @@
 // src/domain/services/GameEngine.js
 
-
 import { WEAPON_TYPES, Weapon } from "../entities/Weapon.js"
 import { ENEMY_TYPES, Enemy } from "../entities/Enemy.js"
 import { Map } from "../entities/Map.js"
 import { Player } from "../entities/Player.js"
+import { Portal } from "../entities/Portal.js"
 import { GameUI } from "../../presentation/GameUI.js"
 import { Corridor } from "../entities/Corridor.js"
+
 export class GameEngine {
     constructor() {
         this.player_ = null;
         this.weapons_ = [];
         this.enems_ = [];
+        this.portal_ = null;
         this.map_ = null;
         this.level_ = 1;
         this.playRoom_ = null;
@@ -22,6 +24,7 @@ export class GameEngine {
     get player() { return this.player_; }
     get weapons() { return this.weapons_; }
     get enems() { return this.enems_; }
+    get portal() { return this.portal_; }
     get map() { return this.map_; }
     get playRoom() { return this.playRoom_; }
     set playRoom(room) { this.playRoom_ = room; }
@@ -41,13 +44,40 @@ export class GameEngine {
     generateLevel() {
         this.generateWeapons();
         this.generateEnems();
+        this.generatePortal();
         this.generateMap();
+    }
+
+    nextLevel() {
+        this.level_++;
+        
+        // Playerning health va strengthini biroz tiklash
+        const healAmount = Math.floor(this.player_.maxHealth / 3);
+        this.player_.health = Math.min(
+            this.player_.maxHealth,
+            this.player_.health + healAmount
+        );
+        
+        this.ui_.messages_.push(`=== LEVEL ${this.level_} ===`);
+        this.ui_.messages_.push(`You feel stronger! (+${healAmount} HP)`);
+        
+        // Yangi level generatsiya qilish
+        this.generateLevel();
+        this.placeEntities();
+        this.map.drawRooms();
+        this.ui_.renderMessage();
+        this.ui_.renderMap(this.map_.grid);
+        this.ui_.renderStats(this.player_);
     }
 
     generateWeapons() {
         this.weapons_ = [];
 
-        const weaponCount = this.level_ + Math.floor(Math.random() * 3);
+        // Level ortishi bilan ko'proq qurol
+        const baseCount = 2;
+        const levelBonus = Math.floor(this.level_ / 2);
+        const randomBonus = Math.floor(Math.random() * 2);
+        const weaponCount = baseCount + levelBonus + randomBonus;
 
         const weaponTypes = Object.values(WEAPON_TYPES);
 
@@ -62,16 +92,24 @@ export class GameEngine {
     generateEnems() {
         this.enems_ = [];
 
-        const enemsCount = this.level_ + Math.floor(Math.random() * 2);
+        // Level ortishi bilan ko'proq va kuchliroq dushmanlar
+        const baseCount = 3;
+        const levelBonus = Math.floor(this.level_ * 1.5);
+        const randomBonus = Math.floor(Math.random() * 2);
+        const enemsCount = baseCount + levelBonus + randomBonus;
 
         const enemsTypes = Object.values(ENEMY_TYPES);
 
         for(let i = 0; i < enemsCount; i++) {
             const randomType = enemsTypes[Math.floor(Math.random() * enemsTypes.length)];
-            const enemy = new Enemy(randomType);
+            const enemy = new Enemy(randomType, this.level_); // Level parametrini qo'shamiz
 
             this.enems_.push(enemy);
         }
+    }
+
+    generatePortal() {
+        this.portal_ = new Portal();
     }
 
     generateMap() {
@@ -84,6 +122,7 @@ export class GameEngine {
 
     placeEntities() {
         this.placePlayer();
+        this.placePortal();
         this.placeWeapons();
         this.placeEnems();
     }
@@ -103,6 +142,20 @@ export class GameEngine {
         
         randomRoom.appendEntitiesInRoom(this.player_);
         randomRoom.isVisible = true;
+    }
+
+    placePortal() {
+        const rooms = this.map_.rooms.filter(r => this.playRoom_ !== r);
+        const randomRoomIndex = Math.floor(Math.random() * rooms.length);
+        const randomRoom = rooms[randomRoomIndex];
+
+        const availableCells = randomRoom.findAvailableCells();
+        const position = availableCells[Math.floor(Math.random() * availableCells.length)];
+
+        this.portal_.x = position.x;
+        this.portal_.y = position.y;
+
+        randomRoom.appendEntitiesInRoom(this.portal_);
     }
 
     placeWeapons() {
@@ -170,8 +223,14 @@ export class GameEngine {
     openInventor() {
         const player = this.player_;
         const playerInventors = player.inventory;
-        for(let i = 0; i < playerInventors.length; i++) {
-            this.ui_.messages_.push(`${i + 1}) ${playerInventors[i].char}`);
+        
+        if(playerInventors.length === 0) {
+            this.ui_.messages_.push("Inventory is empty!");
+        } else {
+            for(let i = 0; i < playerInventors.length; i++) {
+                const equipped = playerInventors[i] === player.equippedWeapon ? " (equipped)" : "";
+                this.ui_.messages_.push(`${i + 1}) ${playerInventors[i].char}${equipped}`);
+            }
         }
 
         this.moveEnemies();
@@ -186,16 +245,30 @@ export class GameEngine {
         const room = this.playRoom_;
 
         const weapons = room.getWeapons();
+        let foundWeapon = false;
+        
         weapons.forEach(weapon => {
             const distanceX = Math.abs(player.x - weapon.x);
             const distanceY = Math.abs(player.y - weapon.y);
             if((distanceX === 1 && distanceY === 0) || (distanceY === 1 && distanceX === 0)) {
-                // player.equippedWeapon = weapon;
                 player.inventory.push(weapon);
+                
+                // Agar player qurolsiz bo'lsa, avtomatik equip qilish
+                if(!player.equippedWeapon) {
+                    player.equippedWeapon = weapon;
+                    this.ui_.messages_.push(`Weapon ${weapon.char} picked up and equipped!`);
+                } else {
+                    this.ui_.messages_.push(`Weapon ${weapon.char} added to inventory!`);
+                }
+                
                 room.grid[weapon.y][weapon.x] = 0;
-                this.ui_.messages_.push(`Weapon ${weapon.char} equipped!`);
+                foundWeapon = true;
             }
         });
+        
+        if(!foundWeapon) {
+            this.ui_.messages_.push("No weapon nearby!");
+        }
         
         this.moveEnemies();
         this.map_.drawRooms();
@@ -203,7 +276,6 @@ export class GameEngine {
         this.ui_.renderMap(this.map_.grid);
         this.ui_.renderStats(player);
     }
-
 
     move(dx, dy) {
         const player = this.player_;
@@ -229,6 +301,11 @@ export class GameEngine {
             return;
         }
 
+        if (targetCell instanceof Portal) {
+            this.enterPortal();
+            return;
+        }
+
         if (targetCell === 0) {
             room.grid[player.y][player.x] = 0;
             player.move(dx, dy);
@@ -239,6 +316,12 @@ export class GameEngine {
         }
 
         this.updateGameState();
+    }
+
+    enterPortal() {
+        this.ui_.messages_.push("You step through the portal...");
+        this.ui_.messages_.push("The world shifts around you!");
+        this.nextLevel();
     }
 
     enterCorridor(corridor) {
@@ -371,7 +454,18 @@ export class GameEngine {
         if (!isEnemyAlive) {
             room.grid[newY][newX] = 0;
             this.ui_.messages_.push(`You defeated the ${enemy.type}!`);
-            player.gainExperience(enemy.experienceValue || 5);
+            
+            // Level ga qarab ko'proq experience va gold berish
+            const baseExp = enemy.experienceValue || 5;
+            const expBonus = Math.floor(this.level_ * 2);
+            const totalExp = baseExp + expBonus;
+            
+            const goldDrop = Math.floor(Math.random() * (10 * this.level_)) + (5 * this.level_);
+            
+            player.gainExperience(totalExp);
+            player.gold += goldDrop;
+            
+            this.ui_.messages_.push(`+${totalExp} EXP, +${goldDrop} Gold`);
         }
         
         this.updateGameState();
@@ -399,7 +493,9 @@ export class GameEngine {
                 const enemyNewY = enemy.y + movePosition.dy;
 
                 if(enemyNewY >= room.height || 
-                    enemyNewX >= room.width) {
+                    enemyNewX >= room.width || 
+                    enemyNewY < 0 || 
+                    enemyNewX < 0) {
                     continue;
                 }
 
@@ -407,14 +503,16 @@ export class GameEngine {
                 const distanceY = Math.abs(player.y - enemy.y);
                 
                 if((distanceX === 1 && distanceY === 0) || (distanceY === 1 && distanceX === 0)){
-                        const enemyDamage = enemy.attack();
-                        const isPlayerAlive = player.takeDamage(enemyDamage);
-                        this.ui_.messages_.push(`The ${enemy.type} hits you!`);
-                        if(!isPlayerAlive) {
-                            this.ui_.renderMessage('Game Over! You died.');
-                        }
-                        continue;
+                    const enemyDamage = enemy.attack();
+                    const isPlayerAlive = player.takeDamage(enemyDamage);
+                    this.ui_.messages_.push(`The ${enemy.type} hits you for ${enemyDamage} damage!`);
+                    if(!isPlayerAlive) {
+                        this.ui_.messages_.push('Game Over! You died.');
+                        this.ui_.renderMessage();
+                        setTimeout(() => process.exit(0), 2000);
                     }
+                    continue;
+                }
                 
                 const enemyTargetCell = room.grid[enemyNewY][enemyNewX];
 
@@ -423,6 +521,5 @@ export class GameEngine {
                 }
             }
         }
-
     }
 }

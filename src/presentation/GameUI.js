@@ -1,6 +1,6 @@
 // src/presentation/GameUI.js
 
-import blessed from 'blessed'
+import blessed from 'blessed';
 
 export class GameUI {
     constructor() {
@@ -37,6 +37,7 @@ export class GameUI {
                 bg: 'black'
             }
         });
+        
         this.mapBox_ = blessed.box({
             top: 6,
             left: 0,
@@ -97,8 +98,6 @@ export class GameUI {
     renderMap(map) {
         let mapContent = '';
 
-        
-
         for(let i = 0; i < map.length; i++) {
             let line = '';
             const array = map[i];
@@ -110,7 +109,6 @@ export class GameUI {
         this.mapBox_.setContent(mapContent);
         this.screen.program.hideCursor();
         this.screen.render();
-
     }
 
     renderMessage() {
@@ -157,7 +155,7 @@ export class GameUI {
             `{center}Exp: {magenta-fg}{bold}${stats.experience}{/bold}{/magenta-fg}/{bold}${stats.maxExperience}{/bold}{/center}`
         );
 
-        const weaponText = stats.weapon ? stats.weapon : 'No';
+        const weaponText = stats.weapon ? stats.weapon : 'None';
         this.statBoxes_[3].setContent(
             `{center}Wen: {yellow-fg}{bold}${weaponText}{/bold}{/yellow-fg}{/center}`
         );

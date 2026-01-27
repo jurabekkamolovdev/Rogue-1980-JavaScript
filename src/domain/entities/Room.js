@@ -1,8 +1,10 @@
 // src/domain/entities/Room.js
-import { Enemy } from "./Enemy.js"
-import { Weapon } from "./Weapon.js"
-import { Player } from "./Player.js"
+import { Enemy } from "./Enemy.js";
+import { Weapon } from "./Weapon.js";
+import { Player } from "./Player.js";
+import { Portal } from "./Portal.js";
 import { Corridor } from "./Corridor.js";
+
 export class Room {
     constructor(width, height) {
         this.width_ = width;
@@ -17,7 +19,6 @@ export class Room {
             () => Array(width).fill(0)
         );
         this.setWalls();
-
     }
 
     get width() { return this.width_; }
@@ -34,10 +35,6 @@ export class Room {
     get isVisible() { return this.isVisible_; }
     set isVisible(value) { this.isVisible_ = value; }
 
-    /**
-     * 
-     * @param {any} entity 
-     */
     appendEntitiesInRoom(entity) {
         this.grid_[entity.y][entity.x] = entity;
     }
@@ -56,16 +53,12 @@ export class Room {
         }
     }
 
-    /**
-     * 
-     * @returns {Array<{x: number, y: number}>}
-     */
     findAvailableCells() {
         const result = [];
         for(let i = 0; i < this.height_; i++) {
             for(let j = 0; j < this.width_; j++) {
                 if(this.grid_[i][j] === 0) {
-                    result.push({x: j, y: i})
+                    result.push({x: j, y: i});
                 }
             }
         }
@@ -82,27 +75,19 @@ export class Room {
         }
     }
 
-    /**
-     * 
-     * @returns {Player}
-     */
     getPlayer() {
         return this.grid_.flat().find(p => p instanceof Player) || null;
     }
 
-    /**
-     * 
-     * @returns {Array<Weapon>}
-     */
     getWeapons() {
         return this.grid_.flat().filter(we => we instanceof Weapon);
     }
 
-    /**
-     * 
-     * @returns { Array<Enemy> }
-     */
     getEnems() {
         return this.grid_.flat().filter(en => en instanceof Enemy);
+    }
+
+    getPortal() {
+        return this.grid_.flat().find(p => p instanceof Portal) || null;
     }
 }

@@ -1,6 +1,5 @@
 // src/domain/entities/Map.js
 
-
 const ROOMS_IN_WIDTH = 3;
 const ROOMS_IN_HEIGHT = 3;
 const ROOMS_NUM = ROOMS_IN_HEIGHT * ROOMS_IN_WIDTH;
@@ -13,14 +12,12 @@ const MAX_ROOM_HEIGHT = REGION_HEIGHT - 2;
 const MAP_WIDTH = ROOMS_IN_WIDTH * REGION_WIDTH;
 const MAP_HEIGHT = ROOMS_IN_HEIGHT * REGION_HEIGHT;
 
-
-import { Room } from "./Room.js"
-import { Weapon } from "../entities/Weapon.js"
-import { Enemy } from "../entities/Enemy.js"
-import { Player } from "../entities/Player.js" 
-import { Corridor } from "./Corridor.js"; 
-
-
+import { Room } from "./Room.js";
+import { Weapon } from "../entities/Weapon.js";
+import { Enemy } from "../entities/Enemy.js";
+import { Player } from "../entities/Player.js";
+import { Portal } from "../entities/Portal.js";
+import { Corridor } from "./Corridor.js";
 
 export class Map {
     constructor() {
@@ -36,11 +33,7 @@ export class Map {
         this.generateCorridor();
     }
 
-    /**
-     * @returns { Room }
-     */
     get rooms() { return this.rooms_; }
-
     get grid() { return this.grid_; }
     get corridors() { return this.corridors_; }
 
@@ -118,13 +111,11 @@ export class Map {
             corridor.addPathPoint(x, rightMapY);
         }
 
-
         leftRoom.grid[leftY][leftRoom.width - 1] = corridor;
         rightRoom.grid[rightY][0] = corridor;
         
         this.corridors_.push(corridor);
     }
-
 
     createVerticalCorridor(topRoom, bottomRoom) {
         const corridor = new Corridor();
@@ -197,7 +188,6 @@ export class Map {
 
         for (let ry = 0; ry < ROOMS_IN_HEIGHT; ry++) {
             for (let rx = 0; rx < ROOMS_IN_WIDTH; rx++) {
-
                 const room = this.rooms_[index++];
 
                 const offsetX = rx * REGION_WIDTH;
@@ -216,9 +206,8 @@ export class Map {
     }
 
     drawRooms() {
-        // const rooms = this.rooms_;
-        // console.log(rooms1);
         const rooms = this.rooms_.filter(room => room.isVisible === true);
+        
         for(let i = 0; i < rooms.length; i++) {
             const room = rooms[i];
             room.refreshRoom();
@@ -236,6 +225,8 @@ export class Map {
                         this.grid_[mapY][mapX] = ')';
                     } else if(room.grid[ry][rx] instanceof Player) {
                         this.grid_[mapY][mapX] = '@';
+                    } else if(room.grid[ry][rx] instanceof Portal) {
+                        this.grid_[mapY][mapX] = room.grid[ry][rx].char;
                     } else if(room.grid[ry][rx] instanceof Corridor) {
                         this.grid_[mapY][mapX] = '+';
                     } else {
@@ -244,8 +235,6 @@ export class Map {
                 }
             }
         }
-
-        // this.drawCorridor();
     }
 
     drawCorridor() {
@@ -257,7 +246,4 @@ export class Map {
             }
         }
     }
-
 }
-
-

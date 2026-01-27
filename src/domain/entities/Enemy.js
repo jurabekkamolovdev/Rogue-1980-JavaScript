@@ -1,6 +1,5 @@
 // src/domain/entities/Enemy.js
 
-
 export const ENEMY_TYPES = {
     Zombie: 'zombie',
     Vampire: 'vampire',
@@ -51,49 +50,55 @@ const ENEMY_STATS = {
     }
 };
 
-
 export class Enemy {
-    constructor(type) {
+    constructor(type, level = 1) {
         if (!ENEMY_STATS[type]) {
             throw new Error(`Unknown enemy type: ${type}`);
         }
 
-        this.type_ = type
-        this.x_ = 0
-        this.y_ = 0
-        this.health_ = 0
-        this.damage_ = 0
-        this.generateEnemy()
+        this.type_ = type;
+        this.level_ = level;
+        this.x_ = 0;
+        this.y_ = 0;
+        this.health_ = 0;
+        this.damage_ = 0;
+        this.experienceValue_ = 5;
+        this.generateEnemy();
     }
 
-    get type() { return this.type_ }
+    get type() { return this.type_; }
 
-    get x() { return this.x_ }
-    set x(val) { this.x_ = val }
+    get x() { return this.x_; }
+    set x(val) { this.x_ = val; }
 
-    get y() { return this.y_ }
-    set y(val) { this.y_ = val }
+    get y() { return this.y_; }
+    set y(val) { this.y_ = val; }
 
-    get health() { return this.health_ }
-    get damage() { return this.damage_ }
+    get health() { return this.health_; }
+    get damage() { return this.damage_; }
+    get experienceValue() { return this.experienceValue_; }
 
     get char() { 
-        return ENEMY_STATS[this.type_].char 
+        return ENEMY_STATS[this.type_].char;
     }
 
     generateEnemy() {
-        const stats = ENEMY_STATS[this.type_]
-        if (!stats) return
+        const stats = ENEMY_STATS[this.type_];
+        if (!stats) return;
 
-        this.health_ = Math.floor(Math.random() * (stats.hpMax - stats.hpMin + 1)) + stats.hpMin
-        this.damage_ = Math.floor(Math.random() * (stats.dmgMax - stats.dmgMin + 1)) + stats.dmgMin
+        // Level ga qarab kuchliroq dushmanlar
+        const levelMultiplier = 1 + (this.level_ - 1) * 0.3;
+        
+        const baseHp = Math.floor(Math.random() * (stats.hpMax - stats.hpMin + 1)) + stats.hpMin;
+        const baseDmg = Math.floor(Math.random() * (stats.dmgMax - stats.dmgMin + 1)) + stats.dmgMin;
+        
+        this.health_ = Math.floor(baseHp * levelMultiplier);
+        this.damage_ = Math.floor(baseDmg * levelMultiplier);
+        
+        // Experience ham level ga qarab ko'payadi
+        this.experienceValue_ = Math.floor(5 * levelMultiplier);
     }
 
-    /**
-     * 
-     * @param {Number} playerX 
-     * @param {Number} playerY 
-     */
     calculateMove(playerX, playerY) {
         const dx = playerX - this.x_;
         const dy = playerY - this.y_;
@@ -113,11 +118,6 @@ export class Enemy {
         this.y_ += dy;
     }
 
-    /**
-     * 
-     * @param {Number} amount 
-     * @returns { Boolean }
-     */
     takeDamage(amount) {
         this.health_ -= amount;
         if(this.health_ < 0) {
@@ -127,23 +127,16 @@ export class Enemy {
         return this.health_ > 0;
     }
 
-    /**
-     * 
-     * @returns { Number }
-     */
     attack() {
         return this.damage_;
     }
 
-    /**
-     * 
-     * @returns { Object }
-     */
     getState() {
         return {
             type: this.type_,
             damage: this.damage_,
-            health: this.health_
-        }
+            health: this.health_,
+            level: this.level_
+        };
     }
 }
