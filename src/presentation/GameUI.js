@@ -13,7 +13,6 @@ export class GameUI {
 
         this.initScreen();
         this.initBoxes();
-        this.setupKeyHandlers();
     }
 
     initScreen() {
@@ -87,12 +86,6 @@ export class GameUI {
             });
             this.statBoxes_.push(statBox);
         }
-    }
-
-    setupKeyHandlers() {
-        this.screen.key(['escape', 'q', 'C-c'], () => {
-            return process.exit(0);
-        });
     }
 
     renderMap(map) {

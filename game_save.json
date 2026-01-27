@@ -1,0 +1,23 @@
+{
+  "gameLevel": 1,
+  "player": {
+    "stats": {
+      "level": 1,
+      "maxHealth": 12,
+      "currentHealth": 12,
+      "maxStrength": 17,
+      "currentStrength": 1,
+      "gold": 0,
+      "armor": 0,
+      "experience": 0,
+      "maxExperience": 10,
+      "weapon": "Bow"
+    },
+    "inventory": [
+      "bow",
+      "mace",
+      "dart"
+    ],
+    "equippedWeapon": "bow"
+  }
+}

@@ -7,9 +7,11 @@ import { Player } from "../entities/Player.js"
 import { Portal } from "../entities/Portal.js"
 import { GameUI } from "../../presentation/GameUI.js"
 import { Corridor } from "../entities/Corridor.js"
+import { SaveSystem } from "./SaveSystem.js";
 
 export class GameEngine {
     constructor() {
+        this.saveSystem_ = new SaveSystem();
         this.player_ = null;
         this.weapons_ = [];
         this.enems_ = [];
@@ -30,16 +32,33 @@ export class GameEngine {
     set playRoom(room) { this.playRoom_ = room; }
 
     startNewGame() {
-        this.level_ = 1;
+        const save = this.saveSystem_.loadGame();
 
-        this.generatePlayer();
-        this.generateLevel();
-        this.placeEntities();
+        if (save) {
+            // LOAD GAME
+            this.level_ = save.gameLevel;
+            this.player_ = Player.fromSave(save.player);
+
+            this.generateLevel();
+            this.placeEntities();
+
+            this.ui_.messages_.push("Game loaded!");
+        } else {
+            // NEW GAME
+            this.level_ = 1;
+            this.generatePlayer();
+            this.generateLevel();
+            this.placeEntities();
+
+            this.ui_.messages_.push("New game started!");
+        }
+
         this.map.drawRooms();
         this.ui_.renderMap(this.map_.grid);
         this.ui_.renderStats(this.player_);
         this.setupControls();
     }
+
 
     generateLevel() {
         this.generateWeapons();
@@ -51,15 +70,7 @@ export class GameEngine {
     nextLevel() {
         this.level_++;
         
-        // Playerning health va strengthini biroz tiklash
-        const healAmount = Math.floor(this.player_.maxHealth / 3);
-        this.player_.health = Math.min(
-            this.player_.maxHealth,
-            this.player_.health + healAmount
-        );
-        
-        this.ui_.messages_.push(`=== LEVEL ${this.level_} ===`);
-        this.ui_.messages_.push(`You feel stronger! (+${healAmount} HP)`);
+        this.player.levelUp();
         
         // Yangi level generatsiya qilish
         this.generateLevel();
@@ -218,6 +229,15 @@ export class GameEngine {
         this.ui_.screen.key(['i', 'I'], () => {
             this.openInventor();
         })
+
+        this.ui_.screen.key(['q', 'Q', 'escape'], () => {
+            this.saveSystem_.saveGame(this);
+            this.ui_.messages_.push("Game saved!");
+            this.ui_.renderMessage();
+
+            setTimeout(() => process.exit(0), 500);
+        });
+
     }
 
     openInventor() {
